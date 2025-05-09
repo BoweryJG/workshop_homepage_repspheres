@@ -15,12 +15,15 @@ import { useTheme } from '@mui/material/styles';
 import InsightsIcon from '@mui/icons-material/Insights';
 import AppsIcon from '@mui/icons-material/Apps';
 import PodcastsIcon from '@mui/icons-material/Podcasts';
+import LanguageIcon from '@mui/icons-material/Language';
 import LoginIcon from '@mui/icons-material/Login';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const navLinks = [
   { label: 'Market Insights', href: '/blog.html', emphasize: false, icon: <InsightsIcon sx={{ mr: 1, fontSize: 22 }} />, fire: true },
-  { label: 'Sphere OS', href: '/workspace.html', emphasize: false, icon: <AppsIcon sx={{ mr: 1, fontSize: 22 }} /> },
+  { label: 'Workspace', href: 'https://ollieiq.netlify.app/', emphasize: false, icon: <AppsIcon sx={{ mr: 1, fontSize: 22 }} /> },
+  { label: 'Linguistics', href: 'https://muilinguistics.netlify.app/', emphasize: false, icon: <LanguageIcon sx={{ mr: 1, fontSize: 22 }} /> },
+  { label: 'Sphere OS', href: 'https://sphereoscrm.netlify.app/', emphasize: false, icon: <AppsIcon sx={{ mr: 1, fontSize: 22 }} /> },
   { label: 'Podcast', href: '/podcast.html', emphasize: true, icon: <PodcastsIcon sx={{ mr: 1, fontSize: 22 }} /> },
 ];
 
