@@ -21,12 +21,13 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import DashboardIcon from '@mui/icons-material/Dashboard'; // For Workspace
 import MemoryIcon from '@mui/icons-material/Memory'; // For Sphere OS
 
+const ACCENT_COLOR = '#00ffc6';
 const navLinks = [
-  { label: 'Market Insights', href: '/blog.html', emphasize: false, icon: <InsightsIcon sx={{ mr: 1, fontSize: 24, color: '#00ffc6' }} />, fire: true },
-  { label: 'Workspace', href: 'https://ollieiq.netlify.app/', emphasize: false, icon: <DashboardIcon sx={{ mr: 1, fontSize: 24, color: '#7B42F6' }} /> },
-  { label: 'Linguistics', href: 'https://muilinguistics.netlify.app/', emphasize: false, icon: <LanguageIcon sx={{ mr: 1, fontSize: 24, color: '#ffb300' }} /> },
-  { label: 'Sphere OS', href: 'https://sphereoscrm.netlify.app/', emphasize: false, icon: <MemoryIcon sx={{ mr: 1, fontSize: 24, color: '#00bcd4' }} /> },
-  { label: 'Podcast', href: '/podcast.html', emphasize: true, icon: <PodcastsIcon sx={{ mr: 1, fontSize: 24, color: '#ff4081' }} /> },
+  { label: 'Market Insights', href: '/blog.html', emphasize: false, icon: <InsightsIcon sx={{ mr: 1, fontSize: 24, color: ACCENT_COLOR }} />, fire: true },
+  { label: 'Workspace', href: 'https://ollieiq.netlify.app/', emphasize: false, icon: <DashboardIcon sx={{ mr: 1, fontSize: 24, color: ACCENT_COLOR }} /> },
+  { label: 'Linguistics', href: 'https://muilinguistics.netlify.app/', emphasize: false, icon: <LanguageIcon sx={{ mr: 1, fontSize: 24, color: ACCENT_COLOR }} /> },
+  { label: 'Sphere OS', href: 'https://sphereoscrm.netlify.app/', emphasize: false, icon: <MemoryIcon sx={{ mr: 1, fontSize: 24, color: ACCENT_COLOR }} /> },
+  { label: 'Podcast', href: '/podcast.html', emphasize: true, icon: <PodcastsIcon sx={{ mr: 1, fontSize: 24, color: ACCENT_COLOR }} /> },
 ];
 
 // Animated fire underline keyframes
