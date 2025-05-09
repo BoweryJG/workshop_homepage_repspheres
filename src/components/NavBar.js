@@ -23,7 +23,7 @@ import MemoryIcon from '@mui/icons-material/Memory'; // For Sphere OS
 
 const ACCENT_COLOR = '#00ffc6';
 const navLinks = [
-  { label: 'Market Insights', href: '/blog.html', emphasize: false, icon: <InsightsIcon sx={{ mr: 1, fontSize: 24, color: ACCENT_COLOR }} />, fire: true },
+  { label: 'Market Insights', href: 'https://marketinsightshd.netlify.app/dashboard', emphasize: false, icon: <InsightsIcon sx={{ mr: 1, fontSize: 24, color: ACCENT_COLOR }} />, fire: true },
   { label: 'Workspace', href: 'https://ollieiq.netlify.app/', emphasize: false, icon: <DashboardIcon sx={{ mr: 1, fontSize: 24, color: ACCENT_COLOR }} /> },
   { label: 'Linguistics', href: 'https://muilinguistics.netlify.app/', emphasize: false, icon: <LanguageIcon sx={{ mr: 1, fontSize: 24, color: ACCENT_COLOR }} /> },
   { label: 'Sphere OS', href: 'https://sphereoscrm.netlify.app/', emphasize: false, icon: <MemoryIcon sx={{ mr: 1, fontSize: 24, color: ACCENT_COLOR }} /> },
