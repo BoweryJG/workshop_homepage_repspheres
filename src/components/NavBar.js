@@ -103,19 +103,43 @@ export default function NavBar() {
       alignItems: 'center',
     }}>
       <Toolbar>
-        <Box sx={{ display: 'flex', alignItems: 'center', fontWeight: 900, fontSize: '1.35rem', letterSpacing: '0.09em', color: '#fff', userSelect: 'none' }}>
-          {orb}
-          <span style={{ fontWeight: 800, letterSpacing: '0.09em', marginRight: 2 }}>Rep</span>
-          <span style={{
-            background: 'linear-gradient(90deg, #00ffc6 0%, #7B42F6 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            fontWeight: 800,
-            letterSpacing: '0.09em',
-            transition: 'background 0.4s',
-          }}>
-            Spheres
+        <Box sx={{ display: 'flex', alignItems: 'center', fontWeight: 900, fontSize: { xs: '1.35rem', md: '1.10rem' }, letterSpacing: '0.09em', color: '#fff', userSelect: 'none' }}>
+          <span style={{ display: 'flex', alignItems: 'center' }}>
+            {/* Responsive orb logo size */}
+            <span style={{ display: 'inline-flex', alignItems: 'center', marginRight: 2 }}>
+              <span style={{ width: 32, height: 32, display: 'inline-block' }}>
+                <span style={{ display: 'none', md: { display: 'inline-block' } }}>{/* for SSR safety */}</span>
+                <span style={{ width: 26, height: 26, display: 'none' }}></span>
+                <span style={{ display: 'inline-block', width: '100%', height: '100%' }}>{orb}</span>
+              </span>
+            </span>
+            <span style={{ fontWeight: 800, letterSpacing: '0.09em', marginRight: 2 }}>Rep</span>
+            <span style={{
+              background: 'linear-gradient(90deg, #00ffc6 0%, #7B42F6 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              fontWeight: 800,
+              letterSpacing: '0.09em',
+              transition: 'background 0.4s',
+            }}>
+              Spheres
+            </span>
           </span>
+          {/* Desktop divider and spacing */}
+          {!isMobile && (
+            <>
+              <Box sx={{ width: 24 }} />
+              <Box sx={{ height: 36, display: 'flex', alignItems: 'center', mx: 1 }}>
+                <span style={{
+                  borderLeft: '2px solid rgba(255,255,255,0.13)',
+                  height: 28,
+                  margin: '0 16px',
+                  display: 'inline-block',
+                }} />
+              </Box>
+              <Box sx={{ width: 16 }} />
+            </>
+          )}
         </Box>
         {isMobile ? (
           <>
