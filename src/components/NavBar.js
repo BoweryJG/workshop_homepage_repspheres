@@ -18,13 +18,15 @@ import PodcastsIcon from '@mui/icons-material/Podcasts';
 import LanguageIcon from '@mui/icons-material/Language';
 import LoginIcon from '@mui/icons-material/Login';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import DashboardIcon from '@mui/icons-material/Dashboard'; // For Workspace
+import MemoryIcon from '@mui/icons-material/Memory'; // For Sphere OS
 
 const navLinks = [
-  { label: 'Market Insights', href: '/blog.html', emphasize: false, icon: <InsightsIcon sx={{ mr: 1, fontSize: 22 }} />, fire: true },
-  { label: 'Workspace', href: 'https://ollieiq.netlify.app/', emphasize: false, icon: <AppsIcon sx={{ mr: 1, fontSize: 22 }} /> },
-  { label: 'Linguistics', href: 'https://muilinguistics.netlify.app/', emphasize: false, icon: <LanguageIcon sx={{ mr: 1, fontSize: 22 }} /> },
-  { label: 'Sphere OS', href: 'https://sphereoscrm.netlify.app/', emphasize: false, icon: <AppsIcon sx={{ mr: 1, fontSize: 22 }} /> },
-  { label: 'Podcast', href: '/podcast.html', emphasize: true, icon: <PodcastsIcon sx={{ mr: 1, fontSize: 22 }} /> },
+  { label: 'Market Insights', href: '/blog.html', emphasize: false, icon: <InsightsIcon sx={{ mr: 1, fontSize: 24, color: '#00ffc6' }} />, fire: true },
+  { label: 'Workspace', href: 'https://ollieiq.netlify.app/', emphasize: false, icon: <DashboardIcon sx={{ mr: 1, fontSize: 24, color: '#7B42F6' }} /> },
+  { label: 'Linguistics', href: 'https://muilinguistics.netlify.app/', emphasize: false, icon: <LanguageIcon sx={{ mr: 1, fontSize: 24, color: '#ffb300' }} /> },
+  { label: 'Sphere OS', href: 'https://sphereoscrm.netlify.app/', emphasize: false, icon: <MemoryIcon sx={{ mr: 1, fontSize: 24, color: '#00bcd4' }} /> },
+  { label: 'Podcast', href: '/podcast.html', emphasize: true, icon: <PodcastsIcon sx={{ mr: 1, fontSize: 24, color: '#ff4081' }} /> },
 ];
 
 // Animated fire underline keyframes
@@ -77,8 +79,13 @@ export default function NavBar() {
 
   return (
     <AppBar position="sticky" elevation={0} sx={{
-      background: 'linear-gradient(90deg, rgba(24,24,43,0.72) 60%, rgba(123,66,246,0.44) 100%)',
+      background: 'rgba(24,24,43,0.52)',
+      backdropFilter: 'blur(18px) saturate(130%)',
+      WebkitBackdropFilter: 'blur(18px) saturate(130%)',
+      borderRadius: { xs: 0, md: '0 0 26px 26px' },
       boxShadow: '0 8px 32px 0 rgba(123,66,246,0.17)',
+      border: '1.5px solid rgba(123,66,246,0.13)',
+      transition: 'background 0.24s',
       backdropFilter: 'blur(22px)',
       borderBottom: '1.5px solid rgba(123,66,246,0.10)',
       zIndex: 1200,
