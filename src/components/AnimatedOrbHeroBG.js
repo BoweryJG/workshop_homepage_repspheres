@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import Box from "@mui/material/Box";
+import { useOrbContext } from "./OrbContextProvider";
 
 const AnimatedOrbHeroBG = ({
   style = {},
@@ -92,6 +93,9 @@ const AnimatedOrbHeroBG = ({
   const childrenGroupRef = useRef(null);
   const particlesGroupRef = useRef(null);
   const particlesRef = useRef([]); // Particle state
+  // Get the context for sharing orb colors
+  const { updateGradientColors } = useOrbContext();
+
   // --- Animation and Orb Logic ---
   useEffect(() => {
     if (!visible) return;
@@ -229,9 +233,23 @@ const AnimatedOrbHeroBG = ({
         const hue = (baseHue + 60 * Math.sin(now * 0.00015 + stop.phase)) % 360;
         const sat = 80 + 10 * Math.sin(now * 0.0002 + stop.phase);
         const light = 60 + 10 * Math.cos(now * 0.00018 + stop.phase);
-        const gradStop = svg.querySelector(`#${stop.id}`);
-        if (gradStop) gradStop.setAttribute('stop-color', hslToHex(hue, sat, light));
-      }
+      const gradStop = svg.querySelector(`#${stop.id}`);
+      if (gradStop) gradStop.setAttribute('stop-color', hslToHex(hue, sat, light));
+    }
+    
+    // Update the shared context with the current gradient colors
+    // We'll use the first and last stop colors for simplicity
+    const startColor = hslToHex(
+      (baseHue + 60 * Math.sin(now * 0.00015 + parentStops[0].phase)) % 360,
+      80 + 10 * Math.sin(now * 0.0002 + parentStops[0].phase),
+      60 + 10 * Math.cos(now * 0.00018 + parentStops[0].phase)
+    );
+    const endColor = hslToHex(
+      (baseHue + 60 * Math.sin(now * 0.00015 + parentStops[1].phase)) % 360,
+      80 + 10 * Math.sin(now * 0.0002 + parentStops[1].phase),
+      60 + 10 * Math.cos(now * 0.00018 + parentStops[1].phase)
+    );
+    updateGradientColors({ start: startColor, end: endColor });
       // --- Parent Orb ---
       const parentState = orbStates[0];
       const parentMorphT = now * 0.0004;

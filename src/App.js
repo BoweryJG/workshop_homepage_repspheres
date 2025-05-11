@@ -6,6 +6,7 @@ import ProblemSection from './components/ProblemSection';
 import SolutionSection from './components/SolutionSection';
 import TimelineSection from './components/TimelineSection';
 import DeploymentSection from './components/DeploymentSection';
+import OrbContextProvider from './components/OrbContextProvider';
 
 
 import CTASection from './components/CTASection';
@@ -14,7 +15,7 @@ import Footer from './components/Footer';
 
 function App() {
   return (
-    <>
+    <OrbContextProvider>
       <StarryBackground />
       <NavBar />
       <HeroSection />
@@ -26,7 +27,7 @@ function App() {
       <CTASection />
       <Footer />
       {/* Add more sections/components as needed */}
-    </>
+    </OrbContextProvider>
   );
 }
 

@@ -20,6 +20,7 @@ import LoginIcon from '@mui/icons-material/Login';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import DashboardIcon from '@mui/icons-material/Dashboard'; // For Workspace
 import MemoryIcon from '@mui/icons-material/Memory'; // For Sphere OS
+import { useOrbContext } from './OrbContextProvider';
 
 const ACCENT_COLOR = '#00ffc6';
 const navLinks = [
@@ -44,14 +45,17 @@ export default function NavBar() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
+  // Get the gradient colors from context
+  const { gradientColors } = useOrbContext();
 
-  // Orb SVG for brand
+  // Orb SVG for brand - now using the shared gradient colors
   const orb = (
     <svg width="32" height="32" viewBox="0 0 32 32" style={{ marginRight: 10, filter: 'drop-shadow(0 0 6px #7B42F6AA)' }}>
       <defs>
         <radialGradient id="orbGrad" cx="50%" cy="50%" r="70%">
-          <stop offset="0%" stopColor="#00ffc6" />
-          <stop offset="100%" stopColor="#7B42F6" />
+          <stop offset="0%" stopColor={gradientColors.start} />
+          <stop offset="100%" stopColor={gradientColors.end} />
         </radialGradient>
       </defs>
       <circle cx="16" cy="16" r="14" fill="url(#orbGrad)" opacity="0.85" />
