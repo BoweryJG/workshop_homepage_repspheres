@@ -24,7 +24,7 @@ import { useOrbContext } from './OrbContextProvider';
 
 const ACCENT_COLOR = '#00ffc6';
 const navLinks = [
-  { label: 'Market Insights', href: 'https://insights.repspheres.com/dashboard', emphasize: false, icon: <InsightsIcon sx={{ mr: 1, fontSize: 24, color: ACCENT_COLOR }} />, fire: true },
+  { label: 'Market Insights', href: 'https://marketdata.repspheres.com', emphasize: false, icon: <InsightsIcon sx={{ mr: 1, fontSize: 24, color: ACCENT_COLOR }} />, fire: true },
   { label: 'Workspace', href: 'https://workspace.repspheres.com/', emphasize: false, icon: <DashboardIcon sx={{ mr: 1, fontSize: 24, color: ACCENT_COLOR }} /> },
   { label: 'Linguistics', href: 'https://linguistics.repspheres.com/', emphasize: false, icon: <LanguageIcon sx={{ mr: 1, fontSize: 24, color: ACCENT_COLOR }} /> },
   { label: 'Sphere OS', href: 'https://crm.repspheres.com/', emphasize: false, icon: <MemoryIcon sx={{ mr: 1, fontSize: 24, color: ACCENT_COLOR }} /> },
