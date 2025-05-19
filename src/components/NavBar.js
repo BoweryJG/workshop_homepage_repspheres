@@ -20,7 +20,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MemoryIcon from '@mui/icons-material/Memory';
 import { useOrbContext } from './OrbContextProvider';
-import ThemeToggle from '../components/ThemeToggle';
+import ThemeToggle from './ThemeToggle';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -270,21 +270,7 @@ export default function NavBar() {
           </ListItem>
         ))}
         
-        {/* Theme Toggle in Drawer */}
-        <ListItem disablePadding sx={{ mt: 2 }}>
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'space-between', 
-            width: '100%', 
-            p: 2,
-            borderRadius: '8px',
-            bgcolor: 'rgba(255,255,255,0.05)'
-          }}>
-            <span>Toggle Theme</span>
-            <ThemeToggle />
-          </Box>
-        </ListItem>
+
       </List>
       
       {/* Auth Buttons */}
@@ -335,6 +321,12 @@ export default function NavBar() {
       maxWidth: '1800px',
       overflow: 'hidden', // Ensures nothing extends outside the AppBar
       zIndex: 1200,
+      backgroundColor: 'rgba(24,24,43,0.52)',
+      backdropFilter: 'blur(10px)',
+      WebkitBackdropFilter: 'blur(10px)',
+      boxShadow: '0 6px 24px 0 rgba(123,66,246,0.15)',
+      border: '1px solid rgba(123,66,246,0.13)',
+      borderBottom: '1px solid rgba(123,66,246,0.10)',
     }}>
       <Toolbar sx={{ 
         px: { xs: 1, sm: 2 },
@@ -436,6 +428,16 @@ export default function NavBar() {
           ml: 'auto',
           gap: { xs: 0.5, sm: 1 },
         }}>
+          {/* Theme Toggle - Subtle but visible */}
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            mr: 1,
+            opacity: 0.8,
+          }}>
+            <ThemeToggle />
+          </Box>
+          
           {/* Auth Buttons - Always visible except on very small screens */}
           <Box sx={{
             display: 'flex',
@@ -516,20 +518,6 @@ export default function NavBar() {
               }
             }}
           >
-            {/* Theme Toggle */}
-            <MenuItem onClick={handleMenuClose}>
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between', 
-                width: '100%',
-                color: '#fff'
-              }}>
-                <span>Toggle Theme</span>
-                <ThemeToggle />
-              </Box>
-            </MenuItem>
-
             <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', my: 1 }} />
 
             {/* More Menu Items */}
