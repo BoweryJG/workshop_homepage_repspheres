@@ -14,14 +14,17 @@ This project is a React application. The sections below outline prerequisites, s
 
 ## Environment variables
 
-The app expects two environment variables to reach the Supabase backend:
+The app expects environment variables to reach both the Supabase backend and your custom backend on Render:
 
 ```bash
 REACT_APP_SUPABASE_URL=<your-supabase-url>
 REACT_APP_SUPABASE_KEY=<your-supabase-key>
+REACT_APP_BACKEND_URL=<your-backend-url>
 ```
 
 You can place them in a local `.env` file or configure them in your deployment environment.
+
+The `REACT_APP_BACKEND_URL` variable should point to your deployed backend on Render (e.g. `https://osbackend-zl1h.onrender.com`). The app uses this URL to create Stripe Checkout sessions when visitors click **Subscribe** in the call-to-action section.
 
 ## Deploying to Netlify
 
