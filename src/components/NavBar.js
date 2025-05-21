@@ -51,24 +51,29 @@ const getNavLinks = (currentUrl) => {
       href: 'https://crm.repspheres.com/',
       icon: <MemoryIcon fontSize="small" sx={{ color: ACCENT_COLOR }} />
     },
-    { 
+    {
       key: 'podcast',
-      label: 'Podcast', 
+      label: 'Podcast',
       href: '/podcast.html',
       icon: <PodcastsIcon fontSize="small" sx={{ color: ACCENT_COLOR }} />
     },
   ];
-  
+
   // Show Linguistics link only if not on the linguistics page
   if (!currentUrl.includes('/linguistics')) {
-    links.splice(2, 0, { 
+    links.splice(2, 0, {
       key: 'linguistics',
-      label: 'Linguistics', 
+      label: 'Linguistics',
       href: 'https://linguistics.repspheres.com/',
       icon: <LanguageIcon fontSize="small" sx={{ color: ACCENT_COLOR }} />
     });
   }
-  
+
+  // Hide podcast link when already on the podcast page
+  if (currentUrl.includes('/podcast.html')) {
+    return links.filter((l) => l.key !== 'podcast');
+  }
+
   return links;
 };
 
