@@ -16,21 +16,37 @@ import CloseIcon from '@mui/icons-material/Close';
  */
 export default function InfoModal({ open, onClose, title, children, maxWidth = 'xs' }) {
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth={maxWidth}
-      fullWidth
-      PaperProps={{
-        sx: {
-          background: 'rgba(20,14,38,0.96)',
-          border: '1px solid rgba(123,66,246,0.4)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
-          borderRadius: 3,
-          color: '#fff',
-        }
-      }}
-    >
+      <Dialog
+        open={open}
+        onClose={onClose}
+        maxWidth={maxWidth}
+        fullWidth
+        PaperProps={{
+          sx: {
+            position: 'relative',
+            background: 'rgba(20,14,38,0.75)',
+            backdropFilter: 'blur(12px)',
+            borderRadius: 3,
+            color: '#fff',
+            overflow: 'hidden',
+            boxShadow:
+              '0 0 0 2px rgba(0,255,198,0.6), 0 0 20px rgba(123,66,246,0.45)',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              inset: 0,
+              padding: '2px',
+              borderRadius: 3,
+              background:
+                'linear-gradient(135deg, rgba(123,66,246,0.8), rgba(0,255,198,0.8))',
+              WebkitMask:
+                'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+              WebkitMaskComposite: 'xor',
+              pointerEvents: 'none',
+            },
+          },
+        }}
+      >
       <DialogTitle
         sx={{
           fontWeight: 700,
