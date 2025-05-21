@@ -1,37 +1,50 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import IconButton from '@mui/material/IconButton';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-import { useTheme } from '@mui/material/styles';
+import InvertColorsIcon from '@mui/icons-material/InvertColors';
 
 /**
- * ThemeToggle component for switching between light and dark themes
- * 
- * This component provides a toggle button to switch between light and dark modes.
- * It automatically adjusts its icon based on the current theme.
+ * Floating theme toggle that inverts the page colors.
  */
-export default function ThemeToggle({ onToggle }) {
-  const theme = useTheme();
-  const isDarkMode = theme.palette.mode === 'dark';
-  
-  // If no onToggle function is provided, use a placeholder
-  const handleToggle = onToggle || (() => {
-    console.log('Theme toggle clicked. To implement theme switching, pass an onToggle function.');
-  });
+export default function ThemeToggle() {
+  const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('invertedTheme') === 'true';
+    setActive(stored);
+    if (stored) {
+      document.body.classList.add('inverted-theme');
+    }
+  }, []);
+
+  const handleToggle = () => {
+    const newVal = !active;
+    setActive(newVal);
+    if (newVal) {
+      document.body.classList.add('inverted-theme');
+    } else {
+      document.body.classList.remove('inverted-theme');
+    }
+    localStorage.setItem('invertedTheme', newVal);
+  };
 
   return (
-    <IconButton 
+    <IconButton
       onClick={handleToggle}
       color="inherit"
-      aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-      sx={{ 
+      aria-label="Toggle color theme"
+      sx={{
+        position: 'fixed',
+        bottom: 16,
+        right: 16,
+        zIndex: 1500,
         color: '#fff',
+        backgroundColor: 'rgba(255,255,255,0.15)',
         '&:hover': {
-          backgroundColor: 'rgba(255,255,255,0.1)'
-        },
+          backgroundColor: 'rgba(255,255,255,0.25)'
+        }
       }}
     >
-      {isDarkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+      <InvertColorsIcon />
     </IconButton>
   );
 }

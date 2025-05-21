@@ -20,7 +20,6 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MemoryIcon from '@mui/icons-material/Memory';
 import { useOrbContext } from './OrbContextProvider';
-import ThemeToggle from './ThemeToggle';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -481,16 +480,6 @@ export default function NavBar() {
           ml: 'auto',
           gap: { xs: 0.5, sm: 1 },
         }}>
-          {/* Theme Toggle - Subtle but visible */}
-          <Box sx={{
-            display: 'flex',
-            alignItems: 'center',
-            mr: 1,
-            opacity: 0.8,
-          }}>
-            <ThemeToggle />
-          </Box>
-          
           {/* Auth Buttons - Always visible except on very small screens */}
           <Box sx={{
             display: 'flex',
