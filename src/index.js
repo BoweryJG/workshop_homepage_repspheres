@@ -3,16 +3,25 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import PodcastPage from './PodcastPage';
+import LoginPage from './LoginPage';
+import SignupPage from './SignupPage';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+const path = window.location.pathname;
+let PageComponent = App;
+if (path === '/podcast.html') {
+  PageComponent = PodcastPage;
+} else if (path === '/login.html') {
+  PageComponent = LoginPage;
+} else if (path === '/signup.html') {
+  PageComponent = SignupPage;
+}
+
 root.render(
   <React.StrictMode>
-    {window.location.pathname === '/podcast.html' ? (
-      <PodcastPage />
-    ) : (
-      <App />
-    )}
+    <PageComponent />
   </React.StrictMode>
 );
 
