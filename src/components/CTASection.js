@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, Stack } from '@mui/material';
+import { createCheckoutSession } from '../stripeService';
 
 export default function CTASection() {
   return (
@@ -34,32 +35,56 @@ export default function CTASection() {
       }}>
         Take the first step toward elite sales performance. Schedule a call with our team to discover how RepSpheres can elevate your results.
       </Typography>
-      <Button
-        variant="contained"
-        href="#contact"
-        size="large"
-        sx={{
-          px: 6,
-          py: 2.2,
-          fontWeight: 700,
-          fontSize: '1.18rem',
-          borderRadius: '30px',
-          background: 'linear-gradient(90deg, #7B42F6 0%, #00ffc6 100%)',
-          boxShadow: '0 4px 24px rgba(123,66,246,0.18)',
-          color: '#fff',
-          transition: 'all 0.22s',
-          textTransform: 'none',
-          '&:hover': {
-            background: 'linear-gradient(90deg, #5B3CFF 0%, #00ffc6 100%)',
-            boxShadow: '0 8px 36px rgba(123,66,246,0.22)',
+      <Stack direction="row" spacing={2}>
+        <Button
+          variant="contained"
+          href="#contact"
+          size="large"
+          sx={{
+            px: 6,
+            py: 2.2,
+            fontWeight: 700,
+            fontSize: '1.18rem',
+            borderRadius: '30px',
+            background: 'linear-gradient(90deg, #7B42F6 0%, #00ffc6 100%)',
+            boxShadow: '0 4px 24px rgba(123,66,246,0.18)',
             color: '#fff',
-            transform: 'translateY(-2px) scale(1.04)'
-          },
-          display: { xs: 'none', md: 'inline-flex' }
-        }}
-      >
-        Schedule a Call
-      </Button>
+            transition: 'all 0.22s',
+            textTransform: 'none',
+            '&:hover': {
+              background: 'linear-gradient(90deg, #5B3CFF 0%, #00ffc6 100%)',
+              boxShadow: '0 8px 36px rgba(123,66,246,0.22)',
+              color: '#fff',
+              transform: 'translateY(-2px) scale(1.04)'
+            },
+            display: { xs: 'none', md: 'inline-flex' }
+          }}
+        >
+          Schedule a Call
+        </Button>
+        <Button
+          variant="outlined"
+          size="large"
+          onClick={createCheckoutSession}
+          sx={{
+            px: 6,
+            py: 2.2,
+            fontWeight: 700,
+            fontSize: '1.18rem',
+            borderRadius: '30px',
+            color: '#00ffc6',
+            borderColor: '#00ffc6',
+            textTransform: 'none',
+            '&:hover': {
+              borderColor: '#5B3CFF',
+              color: '#5B3CFF'
+            },
+            display: { xs: 'none', md: 'inline-flex' }
+          }}
+        >
+          Subscribe
+        </Button>
+      </Stack>
       {/* Sticky mobile CTA */}
       <Box sx={{
         display: { xs: 'flex', md: 'none' },
