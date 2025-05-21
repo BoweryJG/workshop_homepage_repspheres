@@ -144,6 +144,21 @@ export default function NavBar() {
   const handleInfoClose = () => {
     setOpenInfo(null);
   };
+
+  // Sign out handler
+  const handleSignOut = async () => {
+    try {
+      if (typeof supabase !== 'undefined' && supabase.auth) {
+        await supabase.auth.signOut();
+      }
+    } catch (err) {
+      console.error('Error signing out', err);
+    } finally {
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login.html';
+      }
+    }
+  };
   
   // Styles for different button types
   const buttonBaseStyles = {
@@ -304,9 +319,9 @@ export default function NavBar() {
           Log In
         </Button>
         
-        <Button 
-          fullWidth 
-          component="a" 
+        <Button
+          fullWidth
+          component="a"
           href="/signup.html"
           variant="contained"
           sx={{
@@ -316,6 +331,19 @@ export default function NavBar() {
           }}
         >
           Sign Up
+        </Button>
+
+        <Button
+          fullWidth
+          onClick={handleSignOut}
+          variant="outlined"
+          sx={{
+            ...loginButtonStyles,
+            mt: 2,
+            justifyContent: 'center',
+          }}
+        >
+          Log Out
         </Button>
       </Box>
     </Box>
@@ -475,6 +503,14 @@ export default function NavBar() {
               sx={signupButtonStyles}
             >
               Sign Up
+            </Button>
+
+            <Button
+              onClick={handleSignOut}
+              variant="outlined"
+              sx={{ ...loginButtonStyles, ml: { xs: 0.5, sm: 1 } }}
+            >
+              Log Out
             </Button>
           </Box>
 
