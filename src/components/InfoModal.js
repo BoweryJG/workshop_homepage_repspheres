@@ -4,6 +4,11 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import Slide from '@mui/material/Slide';
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 /**
  * InfoModal - reusable modal component with RepSpheres styling
@@ -20,11 +25,11 @@ export default function InfoModal({ open, onClose, title, children, maxWidth = '
         open={open}
         onClose={onClose}
         maxWidth={maxWidth}
-        fullWidth
+        TransitionComponent={Transition}
         PaperProps={{
           sx: {
             position: 'relative',
-            background: 'rgba(20,14,38,0.75)',
+            background: 'rgba(20,14,38,0.6)',
             backdropFilter: 'blur(12px)',
             borderRadius: 3,
             color: '#fff',
