@@ -35,7 +35,7 @@ export default function ThemeToggle() {
       sx={{
         position: 'fixed',
         bottom: 16,
-        right: 16,
+        left: 16,
         zIndex: 1500,
         color: '#fff',
         backgroundColor: 'rgba(255,255,255,0.15)',
