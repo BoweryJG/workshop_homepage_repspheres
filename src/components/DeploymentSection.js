@@ -17,14 +17,14 @@ const deploymentPhases = [
   {
     marker: '3',
     phase: 'Week 5',
-    title: 'Phase 3: Content Engine Activation',
-    content: 'Your custom messaging library goes live, with personalized communications ready for deployment.'
+    title: 'Phase 3: Automations & Reporting',
+    content: 'Link outreach channels and generate actionable physician reports from your data.'
   },
   {
     marker: '4',
     phase: 'Week 6',
-    title: 'Phase 4: Sales Coaching & Execution Loop',
-    content: 'Your team receives training on the system and begins implementing trigger-based communications.'
+    title: 'Phase 4: Sales Coaching & Launch',
+    content: 'Train your team and start deploying trigger-based campaigns.'
   },
   {
     marker: '5',
