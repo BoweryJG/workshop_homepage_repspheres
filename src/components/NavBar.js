@@ -480,9 +480,9 @@ export default function NavBar() {
           ml: 'auto',
           gap: { xs: 0.5, sm: 1 },
         }}>
-          {/* Auth Buttons - Always visible except on very small screens */}
+          {/* Auth Buttons - hide on extra small screens */}
           <Box sx={{
-            display: 'flex',
+            display: { xs: 'none', sm: 'flex' },
             alignItems: 'center',
           }}>
             <Button
