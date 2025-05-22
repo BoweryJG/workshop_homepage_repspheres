@@ -19,8 +19,8 @@ const timelineSteps = [
   },
   {
     marker: '4',
-    title: 'Automated Playbooks & Messaging',
-    content: 'Launch automations or receive suggested actions—personalized messaging, outreach, or tasks—algorithmically aligned to each target\'s unique psychological fingerprint.'
+    title: 'Actionable Reports & Outreach',
+    content: 'Generate physician-ready reports and schedule automated campaigns aligned to each target\'s psychological fingerprint.'
   },
   {
     marker: '5',

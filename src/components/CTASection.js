@@ -23,7 +23,7 @@ export default function CTASection() {
         WebkitTextFillColor: 'transparent',
         backgroundClip: 'text',
       }}>
-        Ready to Transform Your Sales Team?
+        Ready to See RepSpheres in Action?
       </Typography>
       <Typography sx={{
         textAlign: 'center',
@@ -33,7 +33,7 @@ export default function CTASection() {
         fontSize: { xs: '1.12rem', md: '1.22rem' },
         color: 'rgba(255,255,255,0.97)'
       }}>
-        Take the first step toward elite sales performance. Schedule a call with our team to discover how RepSpheres can elevate your results.
+        Request a personalized demo or receive a sample intelligence report to experience the power of RepSpheres firsthand.
       </Typography>
       <Stack direction="row" spacing={2}>
         <Button
@@ -60,7 +60,7 @@ export default function CTASection() {
             display: { xs: 'none', md: 'inline-flex' }
           }}
         >
-          Schedule a Call
+          Schedule Demo
         </Button>
         <Button
           variant="outlined"
@@ -82,7 +82,7 @@ export default function CTASection() {
             display: { xs: 'none', md: 'inline-flex' }
           }}
         >
-          Subscribe
+          Get Sample Report
         </Button>
       </Stack>
       {/* Sticky mobile CTA */}
@@ -120,7 +120,7 @@ export default function CTASection() {
             }
           }}
         >
-          Schedule a Call
+          Schedule Demo
         </Button>
       </Box>
     </Box>
