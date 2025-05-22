@@ -92,9 +92,18 @@ export default function NavBar() {
   const [menuAnchorEl, setMenuAnchorEl] = React.useState(null);
   const [openInfo, setOpenInfo] = React.useState(null); // which info modal is open
   const [openAuth, setOpenAuth] = React.useState(null); // 'login' or 'signup'
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
+
+  React.useEffect(() => {
+    const storedName = localStorage.getItem('name');
+    const storedEmail = localStorage.getItem('email');
+    if (storedName && storedEmail) {
+      setIsLoggedIn(true);
+    }
+  }, []);
   
   // Get current URL to determine which page we're on
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
@@ -164,6 +173,9 @@ export default function NavBar() {
     } catch (err) {
       console.error('Error signing out', err);
     } finally {
+      localStorage.removeItem('name');
+      localStorage.removeItem('email');
+      setIsLoggedIn(false);
       if (typeof window !== 'undefined') {
         window.location.href = '/login.html';
       }
@@ -341,18 +353,20 @@ export default function NavBar() {
           Sign Up
         </Button>
 
-        <Button
-          fullWidth
-          onClick={handleSignOut}
-          variant="outlined"
-          sx={{
-            ...loginButtonStyles,
-            mt: 2,
-            justifyContent: 'center',
-          }}
-        >
-          Log Out
-        </Button>
+        {isLoggedIn && (
+          <Button
+            fullWidth
+            onClick={handleSignOut}
+            variant="outlined"
+            sx={{
+              ...loginButtonStyles,
+              mt: 2,
+              justifyContent: 'center',
+            }}
+          >
+            Log Out
+          </Button>
+        )}
       </Box>
     </Box>
   );
@@ -501,13 +515,15 @@ export default function NavBar() {
               Sign Up
             </Button>
 
-            <Button
-              onClick={handleSignOut}
-              variant="outlined"
-              sx={{ ...loginButtonStyles, ml: { xs: 0.5, sm: 1 } }}
-            >
-              Log Out
-            </Button>
+            {isLoggedIn && (
+              <Button
+                onClick={handleSignOut}
+                variant="outlined"
+                sx={{ ...loginButtonStyles, ml: { xs: 0.5, sm: 1 } }}
+              >
+                Log Out
+              </Button>
+            )}
           </Box>
 
           {/* Mobile Menu Button */}
