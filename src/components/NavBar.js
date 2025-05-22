@@ -15,17 +15,22 @@ import { useTheme } from '@mui/material/styles';
 import InsightsIcon from '@mui/icons-material/Insights';
 import PodcastsIcon from '@mui/icons-material/Podcasts';
 import LanguageIcon from '@mui/icons-material/Language';
-import LoginIcon from '@mui/icons-material/Login';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MemoryIcon from '@mui/icons-material/Memory';
+import LogoutIcon from '@mui/icons-material/Logout';
+import GoogleIcon from '@mui/icons-material/Google';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import PersonIcon from '@mui/icons-material/Person';
 import { useOrbContext } from './OrbContextProvider';
+import { useAuth } from '../contexts/AuthContext';
 import ThemeToggle from './ThemeToggle';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
+import Avatar from '@mui/material/Avatar';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const ACCENT_COLOR = '#00ffc6';
 
@@ -83,9 +88,13 @@ const moreMenuItems = [
 export default function NavBar() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = React.useState(null);
+  const [authMenuAnchorEl, setAuthMenuAnchorEl] = React.useState(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
+  
+  // Get authentication context
+  const { user, loading, signInWithGoogle, signInWithFacebook, signOut } = useAuth();
   
   // Get current URL to determine which page we're on
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
@@ -127,6 +136,20 @@ export default function NavBar() {
     setMenuAnchorEl(null);
   };
   
+  // Handle auth menu
+  const handleAuthMenuOpen = (event) => {
+    setAuthMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleAuthMenuClose = () => {
+    setAuthMenuAnchorEl(null);
+  };
+  
+  const handleSignOut = () => {
+    signOut();
+    handleAuthMenuClose();
+  };
+  
   // Styles for different button types
   const buttonBaseStyles = {
     fontWeight: 500,
@@ -150,36 +173,21 @@ export default function NavBar() {
     },
   };
   
-  const loginButtonStyles = {
+  const googleButtonStyles = {
     ...buttonBaseStyles,
     fontSize: { xs: '0.85rem', sm: '0.9rem' },
     fontWeight: 500,
     px: { xs: 1.2, sm: 1.5 },
     py: 0.5,
-    border: '1px solid #fff',
     borderRadius: '16px',
-    color: '#fff',
-    background: 'rgba(255,255,255,0.08)',
+    color: '#212121',
+    background: '#ffffff',
     '&:hover': {
-      background: 'rgba(255,255,255,0.15)',
-      borderColor: '#3a86ff',
+      background: '#f1f1f1',
+      boxShadow: '0 0 10px rgba(255,255,255,0.5)',
     },
-  };
-  
-  const signupButtonStyles = {
-    ...buttonBaseStyles,
-    fontSize: { xs: '0.85rem', sm: '0.9rem' },
-    fontWeight: 600,
-    px: { xs: 1.2, sm: 1.5 },
-    py: 0.5,
-    ml: { xs: 0.5, sm: 1 },
-    borderRadius: '16px',
-    color: '#fff',
-    background: 'linear-gradient(90deg, #00ffc6 0%, #7B42F6 100%)',
-    '&:hover': {
-      background: 'linear-gradient(90deg, #5B3CFF 0%, #00ffc6 100%)',
-      transform: 'scale(1.03)',
-    },
+    display: 'flex',
+    gap: 1,
   };
   
   // Mobile drawer content
@@ -273,35 +281,85 @@ export default function NavBar() {
 
       </List>
       
-      {/* Auth Buttons */}
+      {/* Auth Button */}
       <Box sx={{ mt: 4, px: 1 }}>
-        <Button 
-          fullWidth 
-          component="a" 
-          href="/login.html"
-          variant="outlined"
-          sx={{
-            ...loginButtonStyles,
-            mb: 2,
-            justifyContent: 'center',
-          }}
-        >
-          Log In
-        </Button>
-        
-        <Button 
-          fullWidth 
-          component="a" 
-          href="/signup.html"
-          variant="contained"
-          sx={{
-            ...signupButtonStyles,
-            ml: 0,
-            justifyContent: 'center',
-          }}
-        >
-          Sign Up
-        </Button>
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+            <CircularProgress size={28} sx={{ color: '#fff', opacity: 0.7 }} />
+          </Box>
+        ) : user ? (
+          <Box>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center',
+              mb: 2,
+              p: 1,
+              borderRadius: '8px',
+              background: 'rgba(255,255,255,0.05)'
+            }}>
+              {user.user_metadata?.avatar_url ? (
+                <Avatar 
+                  src={user.user_metadata.avatar_url} 
+                  sx={{ width: 40, height: 40, mr: 1.5 }}
+                />
+              ) : (
+                <Avatar sx={{ width: 40, height: 40, mr: 1.5, bgcolor: '#7B42F6' }}>
+                  <PersonIcon />
+                </Avatar>
+              )}
+              <Box sx={{ overflow: 'hidden' }}>
+                <Box sx={{ 
+                  fontSize: '0.9rem', 
+                  fontWeight: 500,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}>
+                  {user.user_metadata?.full_name || 'User'}
+                </Box>
+                <Box sx={{ 
+                  fontSize: '0.8rem', 
+                  opacity: 0.7,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}>
+                  {user.email}
+                </Box>
+              </Box>
+            </Box>
+            <Button
+              fullWidth
+              variant="outlined"
+              onClick={signOut}
+              startIcon={<LogoutIcon />}
+              sx={{
+                color: '#fff',
+                borderColor: 'rgba(255,255,255,0.2)',
+                '&:hover': {
+                  borderColor: '#fff',
+                  background: 'rgba(255,255,255,0.1)'
+                }
+              }}
+            >
+              Sign Out
+            </Button>
+          </Box>
+        ) : (
+          <Button 
+            fullWidth
+            variant="contained"
+            onClick={signInWithGoogle}
+            startIcon={<GoogleIcon />}
+            sx={{
+              ...googleButtonStyles,
+              width: '100%',
+              justifyContent: 'center',
+            }}
+          >
+            Sign in with Google
+          </Button>
+        )}
       </Box>
     </Box>
   );
@@ -438,29 +496,70 @@ export default function NavBar() {
             <ThemeToggle />
           </Box>
           
-          {/* Auth Buttons - Always visible except on very small screens */}
+          {/* Auth Button or User Profile */}
           <Box sx={{
             display: 'flex',
             alignItems: 'center',
           }}>
-            <Button
-              component="a"
-              href="/login.html"
-              variant="outlined"
-              sx={loginButtonStyles}
-            >
-              Log In
-            </Button>
-            
-            <Button
-              component="a"
-              href="/signup.html"
-              variant="contained"
-              sx={signupButtonStyles}
-            >
-              Sign Up
-            </Button>
+            {loading ? (
+              <CircularProgress size={24} color="inherit" sx={{ opacity: 0.7 }} />
+            ) : user ? (
+              <IconButton
+                onClick={handleAuthMenuOpen}
+                size="small"
+                sx={{ 
+                  ml: 0.5,
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  p: 0.5
+                }}
+              >
+                {user.user_metadata?.avatar_url ? (
+                  <Avatar 
+                    src={user.user_metadata.avatar_url} 
+                    sx={{ width: 32, height: 32 }}
+                  />
+                ) : (
+                  <PersonIcon sx={{ color: '#fff' }} />
+                )}
+              </IconButton>
+            ) : (
+              <Button
+                variant="contained"
+                onClick={signInWithGoogle}
+                sx={googleButtonStyles}
+                startIcon={<GoogleIcon />}
+              >
+                Sign in with Google
+              </Button>
+            )}
           </Box>
+          
+          {/* User Menu */}
+          <Menu
+            id="auth-menu"
+            anchorEl={authMenuAnchorEl}
+            open={Boolean(authMenuAnchorEl)}
+            onClose={handleAuthMenuClose}
+            PaperProps={{
+              sx: {
+                mt: 1.5,
+                background: 'rgba(20,14,38,0.96)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+                borderRadius: 2,
+                border: '1px solid rgba(123,66,246,0.15)',
+                minWidth: 180,
+              }
+            }}
+          >
+            <MenuItem sx={{ color: '#fff', opacity: 0.8 }}>
+              {user?.email}
+            </MenuItem>
+            <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
+            <MenuItem onClick={handleSignOut} sx={{ color: '#fff' }}>
+              <LogoutIcon fontSize="small" sx={{ mr: 1 }} />
+              Sign Out
+            </MenuItem>
+          </Menu>
 
           {/* Mobile Menu Button */}
           {isMobile && (

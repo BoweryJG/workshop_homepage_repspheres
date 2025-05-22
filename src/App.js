@@ -7,6 +7,7 @@ import SolutionSection from './components/SolutionSection';
 import TimelineSection from './components/TimelineSection';
 import DeploymentSection from './components/DeploymentSection';
 import OrbContextProvider from './components/OrbContextProvider';
+import { AuthProvider } from './contexts/AuthContext';
 
 
 import CTASection from './components/CTASection';
@@ -16,17 +17,18 @@ import Footer from './components/Footer';
 function App() {
   return (
     <OrbContextProvider>
-      <StarryBackground />
-      <NavBar />
-      <HeroSection />
-      <IntelligenceSection />
-      <SolutionSection />
-      <TimelineSection />
-      <DeploymentSection />
-
-      <CTASection />
-      <Footer />
-      {/* Add more sections/components as needed */}
+      <AuthProvider>
+        <StarryBackground />
+        <NavBar />
+        <HeroSection />
+        <IntelligenceSection />
+        <SolutionSection />
+        <TimelineSection />
+        <DeploymentSection />
+        <CTASection />
+        <Footer />
+        {/* Add more sections/components as needed */}
+      </AuthProvider>
     </OrbContextProvider>
   );
 }
