@@ -8,11 +8,10 @@ import TimelineSection from './components/TimelineSection';
 import DeploymentSection from './components/DeploymentSection';
 import OrbContextProvider from './components/OrbContextProvider';
 import { AuthProvider } from './contexts/AuthContext';
-
-
 import CTASection from './components/CTASection';
 import IntelligenceSection from './components/IntelligenceSection';
 import Footer from './components/Footer';
+import ThemeToggle from './components/ThemeToggle';
 
 function App() {
   return (
@@ -27,6 +26,7 @@ function App() {
         <DeploymentSection />
         <CTASection />
         <Footer />
+        <ThemeToggle />
         {/* Add more sections/components as needed */}
       </AuthProvider>
     </OrbContextProvider>

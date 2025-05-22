@@ -19,7 +19,6 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import MemoryIcon from '@mui/icons-material/Memory';
 import LogoutIcon from '@mui/icons-material/Logout';
 import GoogleIcon from '@mui/icons-material/Google';
-import FacebookIcon from '@mui/icons-material/Facebook';
 import PersonIcon from '@mui/icons-material/Person';
 import { useOrbContext } from './OrbContextProvider';
 import { useAuth } from '../contexts/AuthContext';
@@ -31,6 +30,8 @@ import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import Avatar from '@mui/material/Avatar';
 import CircularProgress from '@mui/material/CircularProgress';
+import Typography from '@mui/material/Typography';
+import InfoModal from './InfoModal';
 
 const ACCENT_COLOR = '#00ffc6';
 
@@ -56,45 +57,51 @@ const getNavLinks = (currentUrl) => {
       href: 'https://crm.repspheres.com/',
       icon: <MemoryIcon fontSize="small" sx={{ color: ACCENT_COLOR }} />
     },
-    { 
+    {
       key: 'podcast',
-      label: 'Podcast', 
+      label: 'Podcast',
       href: '/podcast.html',
       icon: <PodcastsIcon fontSize="small" sx={{ color: ACCENT_COLOR }} />
     },
   ];
-  
+
   // Show Linguistics link only if not on the linguistics page
   if (!currentUrl.includes('/linguistics')) {
-    links.splice(2, 0, { 
+    links.splice(2, 0, {
       key: 'linguistics',
-      label: 'Linguistics', 
+      label: 'Linguistics',
       href: 'https://linguistics.repspheres.com/',
       icon: <LanguageIcon fontSize="small" sx={{ color: ACCENT_COLOR }} />
     });
   }
-  
+
+  // Hide podcast link when already on the podcast page
+  if (currentUrl.includes('/podcast.html')) {
+    return links.filter((l) => l.key !== 'podcast');
+  }
+
   return links;
 };
 
-// More menu items
+// More menu items for additional information
 const moreMenuItems = [
-  { label: 'About RepSpheres', href: 'https://repspheres.com/about' },
-  { label: 'Contact', href: 'https://repspheres.com/contact' },
-  { label: 'Careers', href: 'https://repspheres.com/careers' },
-  { label: 'Legal', href: 'https://repspheres.com/legal' }
+  { key: 'about', label: 'About RepSpheres' },
+  { key: 'contact', label: 'Contact' },
+  { key: 'careers', label: 'Careers' },
+  { key: 'legal', label: 'Legal' }
 ];
 
 export default function NavBar() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = React.useState(null);
   const [authMenuAnchorEl, setAuthMenuAnchorEl] = React.useState(null);
+  const [openInfo, setOpenInfo] = React.useState(null); // which info modal is open
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
   
   // Get authentication context
-  const { user, loading, signInWithGoogle, signInWithFacebook, signOut } = useAuth();
+  const { user, loading, signInWithGoogle, signOut } = useAuth();
   
   // Get current URL to determine which page we're on
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
@@ -134,6 +141,16 @@ export default function NavBar() {
 
   const handleMenuClose = () => {
     setMenuAnchorEl(null);
+  };
+  
+  // Open information modal from more menu or drawer
+  const handleInfoOpen = (key) => {
+    handleMenuClose();
+    setOpenInfo(key);
+  };
+
+  const handleInfoClose = () => {
+    setOpenInfo(null);
   };
   
   // Handle auth menu
@@ -264,9 +281,8 @@ export default function NavBar() {
         {moreMenuItems.map((item, index) => (
           <ListItem key={index} disablePadding sx={{ mb: 0.5 }}>
             <ListItemButton
-              component="a"
-              href={item.href}
-              sx={{ 
+              onClick={() => handleInfoOpen(item.key)}
+              sx={{
                 py: 0.75,
                 px: 2,
                 borderRadius: '8px',
@@ -277,8 +293,6 @@ export default function NavBar() {
             </ListItemButton>
           </ListItem>
         ))}
-        
-
       </List>
       
       {/* Auth Button */}
@@ -365,6 +379,7 @@ export default function NavBar() {
   );
 
   return (
+    <>
     <AppBar position="sticky" elevation={0} sx={{
       background: 'rgba(24,24,43,0.52)',
       backdropFilter: 'blur(10px)',
@@ -621,11 +636,9 @@ export default function NavBar() {
 
             {/* More Menu Items */}
             {moreMenuItems.map((item, index) => (
-              <MenuItem 
-                key={index} 
-                component="a"
-                href={item.href}
-                onClick={handleMenuClose}
+              <MenuItem
+                key={index}
+                onClick={() => handleInfoOpen(item.key)}
                 sx={{ color: '#fff' }}
               >
                 {item.label}
@@ -644,5 +657,57 @@ export default function NavBar() {
         </Drawer>
       </Toolbar>
     </AppBar>
+
+    {/* Information Modals */}
+    <InfoModal
+      open={openInfo === 'about'}
+      onClose={handleInfoClose}
+      title="About RepSpheres"
+      maxWidth="xs"
+    >
+      <Typography variant="body1" sx={{ mb: 1 }}>
+        RepSpheres empowers elite sales teams with unified workflows and
+        actionable market intelligence.
+      </Typography>
+    </InfoModal>
+
+    <InfoModal
+      open={openInfo === 'contact'}
+      onClose={handleInfoClose}
+      title="Contact"
+      maxWidth="xs"
+    >
+      <Typography variant="body1" sx={{ mb: 1 }}>
+        Reach us at <a href="mailto:contact@repspheres.com">contact@repspheres.com</a>
+        {' '}to learn more or schedule a call.
+      </Typography>
+    </InfoModal>
+
+    <InfoModal
+      open={openInfo === 'careers'}
+      onClose={handleInfoClose}
+      title="Careers"
+      maxWidth="xs"
+    >
+      <Typography variant="body1" sx={{ mb: 1 }}>
+        We're always looking for talent passionate about sales technology.
+        Send your resume to{' '}
+        <a href="mailto:careers@repspheres.com">careers@repspheres.com</a>.
+      </Typography>
+    </InfoModal>
+
+    <InfoModal
+      open={openInfo === 'legal'}
+      onClose={handleInfoClose}
+      title="Legal"
+      maxWidth="xs"
+    >
+      <Typography variant="body1">
+        Use of RepSpheres is subject to our{' '}
+        <a href="/terms.html">Terms of Service</a> and{' '}
+        <a href="/privacy.html">Privacy Policy</a>.
+      </Typography>
+    </InfoModal>
+    </>
   );
 }
