@@ -32,6 +32,7 @@ import Avatar from '@mui/material/Avatar';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import InfoModal from './InfoModal';
+import AuthModal from './AuthModal';
 
 const ACCENT_COLOR = '#00ffc6';
 
@@ -96,12 +97,13 @@ export default function NavBar() {
   const [menuAnchorEl, setMenuAnchorEl] = React.useState(null);
   const [authMenuAnchorEl, setAuthMenuAnchorEl] = React.useState(null);
   const [openInfo, setOpenInfo] = React.useState(null); // which info modal is open
+  const [openAuth, setOpenAuth] = React.useState(null); // 'login' or 'signup'
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
   
   // Get authentication context
-  const { user, loading, signInWithGoogle, signOut } = useAuth();
+  const { user, loading, signInWithGoogle, signInWithFacebook, signOut } = useAuth();
   
   // Get current URL to determine which page we're on
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
@@ -151,6 +153,14 @@ export default function NavBar() {
 
   const handleInfoClose = () => {
     setOpenInfo(null);
+  };
+
+  const handleAuthOpen = (mode) => {
+    setOpenAuth(mode);
+  };
+
+  const handleAuthClose = () => {
+    setOpenAuth(null);
   };
   
   // Handle auth menu
@@ -205,6 +215,38 @@ export default function NavBar() {
     },
     display: 'flex',
     gap: 1,
+  };
+
+  const loginButtonStyles = {
+    ...buttonBaseStyles,
+    fontSize: { xs: '0.85rem', sm: '0.9rem' },
+    fontWeight: 500,
+    px: { xs: 1.2, sm: 1.5 },
+    py: 0.5,
+    border: '1px solid #fff',
+    borderRadius: '16px',
+    color: '#fff',
+    background: 'rgba(255,255,255,0.08)',
+    '&:hover': {
+      background: 'rgba(255,255,255,0.15)',
+      borderColor: '#3a86ff',
+    },
+  };
+
+  const signupButtonStyles = {
+    ...buttonBaseStyles,
+    fontSize: { xs: '0.85rem', sm: '0.9rem' },
+    fontWeight: 600,
+    px: { xs: 1.2, sm: 1.5 },
+    py: 0.5,
+    ml: { xs: 0.5, sm: 1 },
+    borderRadius: '16px',
+    color: '#fff',
+    background: 'linear-gradient(90deg, #00ffc6 0%, #7B42F6 100%)',
+    '&:hover': {
+      background: 'linear-gradient(90deg, #5B3CFF 0%, #00ffc6 100%)',
+      transform: 'scale(1.03)',
+    },
   };
   
   // Mobile drawer content
@@ -360,19 +402,24 @@ export default function NavBar() {
             </Button>
           </Box>
         ) : (
-          <Button 
-            fullWidth
-            variant="contained"
-            onClick={signInWithGoogle}
-            startIcon={<GoogleIcon />}
-            sx={{
-              ...googleButtonStyles,
-              width: '100%',
-              justifyContent: 'center',
-            }}
-          >
-            Sign in with Google
-          </Button>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Button
+              fullWidth
+              onClick={() => handleAuthOpen('login')}
+              variant="outlined"
+              sx={{ ...loginButtonStyles, justifyContent: 'center' }}
+            >
+              Log In
+            </Button>
+            <Button
+              fullWidth
+              onClick={() => handleAuthOpen('signup')}
+              variant="contained"
+              sx={{ ...signupButtonStyles, ml: 0, justifyContent: 'center' }}
+            >
+              Sign Up
+            </Button>
+          </Box>
         )}
       </Box>
     </Box>
@@ -522,15 +569,15 @@ export default function NavBar() {
               <IconButton
                 onClick={handleAuthMenuOpen}
                 size="small"
-                sx={{ 
+                sx={{
                   ml: 0.5,
                   border: '1px solid rgba(255,255,255,0.2)',
                   p: 0.5
                 }}
               >
                 {user.user_metadata?.avatar_url ? (
-                  <Avatar 
-                    src={user.user_metadata.avatar_url} 
+                  <Avatar
+                    src={user.user_metadata.avatar_url}
                     sx={{ width: 32, height: 32 }}
                   />
                 ) : (
@@ -538,14 +585,22 @@ export default function NavBar() {
                 )}
               </IconButton>
             ) : (
-              <Button
-                variant="contained"
-                onClick={signInWithGoogle}
-                sx={googleButtonStyles}
-                startIcon={<GoogleIcon />}
-              >
-                Sign in with Google
-              </Button>
+              <>
+                <Button
+                  onClick={() => handleAuthOpen('login')}
+                  variant="outlined"
+                  sx={loginButtonStyles}
+                >
+                  Log In
+                </Button>
+                <Button
+                  onClick={() => handleAuthOpen('signup')}
+                  variant="contained"
+                  sx={signupButtonStyles}
+                >
+                  Sign Up
+                </Button>
+              </>
             )}
           </Box>
           
@@ -657,6 +712,18 @@ export default function NavBar() {
         </Drawer>
       </Toolbar>
     </AppBar>
+
+    {/* Auth Modals */}
+    <AuthModal
+      open={openAuth === 'login'}
+      onClose={handleAuthClose}
+      mode="login"
+    />
+    <AuthModal
+      open={openAuth === 'signup'}
+      onClose={handleAuthClose}
+      mode="signup"
+    />
 
     {/* Information Modals */}
     <InfoModal

@@ -1,6 +1,9 @@
 import React from 'react';
-import { Box, TextField, Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import InfoModal from './InfoModal';
+import GoogleIcon from '@mui/icons-material/Google';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import { useAuth } from '../contexts/AuthContext';
 
 /**
  * AuthModal - login or signup form inside InfoModal
@@ -12,6 +15,17 @@ import InfoModal from './InfoModal';
  */
 export default function AuthModal({ open, onClose, mode = 'login' }) {
   const isLogin = mode === 'login';
+  const { signInWithGoogle, signInWithFacebook } = useAuth();
+
+  const handleGoogle = () => {
+    signInWithGoogle();
+    onClose();
+  };
+
+  const handleFacebook = () => {
+    signInWithFacebook();
+    onClose();
+  };
 
   return (
     <InfoModal
@@ -20,36 +34,30 @@ export default function AuthModal({ open, onClose, mode = 'login' }) {
       title={isLogin ? 'Log In' : 'Sign Up'}
       maxWidth="xs"
     >
-      <Box
-        component="form"
-        noValidate
-        sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}
-      >
-        <TextField
-          label="Email"
-          type="email"
-          fullWidth
-          variant="filled"
-          InputProps={{ style: { background: 'rgba(255,255,255,0.1)' } }}
-        />
-        <TextField
-          label="Password"
-          type="password"
-          fullWidth
-          variant="filled"
-          InputProps={{ style: { background: 'rgba(255,255,255,0.1)' } }}
-        />
-        {!isLogin && (
-          <TextField
-            label="Confirm Password"
-            type="password"
-            fullWidth
-            variant="filled"
-            InputProps={{ style: { background: 'rgba(255,255,255,0.1)' } }}
-          />
-        )}
-        <Button variant="contained" color="primary">
-          {isLogin ? 'Log In' : 'Sign Up'}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+        <Button
+          variant="contained"
+          onClick={handleGoogle}
+          startIcon={<GoogleIcon />}
+          sx={{
+            backgroundColor: '#fff',
+            color: '#212121',
+            '&:hover': { backgroundColor: '#f1f1f1' },
+          }}
+        >
+          Continue with Google
+        </Button>
+        <Button
+          variant="contained"
+          onClick={handleFacebook}
+          startIcon={<FacebookIcon />}
+          sx={{
+            backgroundColor: '#1877F2',
+            color: '#fff',
+            '&:hover': { backgroundColor: '#166fe5' },
+          }}
+        >
+          Continue with Facebook
         </Button>
       </Box>
     </InfoModal>
