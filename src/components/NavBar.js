@@ -101,6 +101,9 @@ export default function NavBar() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
+  // Extra small breakpoints for very narrow screens
+  const isXS = useMediaQuery('(max-width:400px)');
+  const isXXS = useMediaQuery('(max-width:320px)');
   
   // Get authentication context
   const { user, loading, signInWithGoogle, signInWithFacebook, signOut } = useAuth();
@@ -248,7 +251,19 @@ export default function NavBar() {
       transform: 'scale(1.03)',
     },
   };
-  
+
+  // Adapt button sizes on very small screens
+  const loginStyles = {
+    ...loginButtonStyles,
+    ...(isXS && { fontSize: '0.75rem', px: 0.8 }),
+    ...(isXXS && { fontSize: '0.7rem', px: 0.5 }),
+  };
+  const signupStyles = {
+    ...signupButtonStyles,
+    ...(isXS && { fontSize: '0.75rem', px: 0.8 }),
+    ...(isXXS && { fontSize: '0.7rem', px: 0.5 }),
+  };
+
   // Mobile drawer content
   const drawerContent = (
     <Box
@@ -407,7 +422,7 @@ export default function NavBar() {
               fullWidth
               onClick={() => handleAuthOpen('login')}
               variant="outlined"
-              sx={{ ...loginButtonStyles, justifyContent: 'center' }}
+              sx={{ ...loginStyles, justifyContent: 'center' }}
             >
               Log In
             </Button>
@@ -415,7 +430,7 @@ export default function NavBar() {
               fullWidth
               onClick={() => handleAuthOpen('signup')}
               variant="contained"
-              sx={{ ...signupButtonStyles, ml: 0, justifyContent: 'center' }}
+              sx={{ ...signupStyles, ml: 0, justifyContent: 'center' }}
             >
               Sign Up
             </Button>
@@ -589,14 +604,14 @@ export default function NavBar() {
                 <Button
                   onClick={() => handleAuthOpen('login')}
                   variant="outlined"
-                  sx={loginButtonStyles}
+                  sx={loginStyles}
                 >
                   Log In
                 </Button>
                 <Button
                   onClick={() => handleAuthOpen('signup')}
                   variant="contained"
-                  sx={signupButtonStyles}
+                  sx={signupStyles}
                 >
                   Sign Up
                 </Button>
@@ -633,12 +648,16 @@ export default function NavBar() {
 
           {/* Mobile Menu Button */}
           {isMobile && (
-            <IconButton 
-              edge="end" 
-              color="inherit" 
+            <IconButton
+              edge="end"
+              color="inherit"
               aria-label="menu"
               onClick={toggleDrawer(true)}
-              sx={{ ml: 1 }}
+              sx={{
+                ml: 1,
+                transform: isXS ? 'scale(0.8)' : 'none',
+                display: isXXS ? 'none' : 'inline-flex',
+              }}
             >
               <MenuIcon />
             </IconButton>
