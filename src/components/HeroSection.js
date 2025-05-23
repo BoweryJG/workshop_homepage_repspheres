@@ -81,7 +81,7 @@ export default function HeroSection() {
       }
     }}
   >
-    Your
+    The
     <Box
       component="span"
       sx={{
@@ -100,11 +100,11 @@ export default function HeroSection() {
         }
       }}
     >
-      AI-Powered
+      Data Advantage
     </Box>
-    Sales Command Center
-    <Box component="span" sx={{ display: 'block' }}>
-      for Dental &amp; Aesthetic Practices
+    That Closes Deals
+    <Box component="span" sx={{ display: 'block', fontSize: { xs: '0.7em', md: '0.75em' }, mt: 1 }}>
+      15 Years of Intelligence. One Platform.
     </Box>
   </Typography>
   <Typography
@@ -113,7 +113,7 @@ export default function HeroSection() {
       fontFamily: "'DM Sans', Arial, sans-serif",
       color: 'rgba(255,255,255,0.92)',
       mb: 5,
-      maxWidth: 600,
+      maxWidth: 700,
       mx: 'auto',
       fontWeight: 400,
       fontSize: { xs: '1.18rem', md: '1.33rem' },
@@ -126,38 +126,66 @@ export default function HeroSection() {
       zIndex: 2,
     }}
   >
-    Real-time US dashboard, automated lead enrichment, and competitive intelligence—everything you need to win more deals.
+    Real-time market insights. AI-powered research with 300+ models. Conversation intelligence. Revolutionary CRM. All unified in one platform that thinks like your best rep.
   </Typography>
-  <Button
-    variant="contained"
-    size="large"
-    href="#schedule"
-    sx={{
-      px: 6,
-      py: 2.1,
-      fontWeight: 800,
-      fontFamily: "'Space Grotesk', 'Montserrat Alternates', Arial, sans-serif",
-      fontSize: { xs: '1.14rem', md: '1.22rem' },
-      borderRadius: '30px',
-      background: 'linear-gradient(90deg, #00ffc6 0%, #7B42F6 100%)',
-      boxShadow: '0 4px 24px rgba(123,66,246,0.18), 0 1.5px 18px #00ffc633',
-      color: '#fff',
-      letterSpacing: '0.04em',
-      textTransform: 'uppercase',
-      transition: 'all 0.22s',
-      mt: 2,
-      position: 'relative',
-      zIndex: 2,
-      '&:hover': {
-        background: 'linear-gradient(270deg, #7B42F6 0%, #00ffc6 100%)',
-        boxShadow: '0 8px 36px rgba(123,66,246,0.22), 0 2px 24px #00ffc655',
+  <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap', mt: 2 }}>
+    <Button
+      variant="contained"
+      size="large"
+      href="#pricing"
+      sx={{
+        px: 6,
+        py: 2.1,
+        fontWeight: 800,
+        fontFamily: "'Space Grotesk', 'Montserrat Alternates', Arial, sans-serif",
+        fontSize: { xs: '1.14rem', md: '1.22rem' },
+        borderRadius: '30px',
+        background: 'linear-gradient(90deg, #00ffc6 0%, #7B42F6 100%)',
+        boxShadow: '0 4px 24px rgba(123,66,246,0.18), 0 1.5px 18px #00ffc633',
         color: '#fff',
-        transform: 'translateY(-2px) scale(1.045)'
-      }
-    }}
-  >
-    Elevate Your Sales Performance →
-  </Button>
+        letterSpacing: '0.04em',
+        textTransform: 'uppercase',
+        transition: 'all 0.22s',
+        position: 'relative',
+        zIndex: 2,
+        '&:hover': {
+          background: 'linear-gradient(270deg, #7B42F6 0%, #00ffc6 100%)',
+          boxShadow: '0 8px 36px rgba(123,66,246,0.22), 0 2px 24px #00ffc655',
+          color: '#fff',
+          transform: 'translateY(-2px) scale(1.045)'
+        }
+      }}
+    >
+      Start Free Trial →
+    </Button>
+    <Button
+      variant="outlined"
+      size="large"
+      href="#demo"
+      sx={{
+        px: 5,
+        py: 2,
+        fontWeight: 700,
+        fontFamily: "'Space Grotesk', Arial, sans-serif",
+        fontSize: { xs: '1.1rem', md: '1.18rem' },
+        borderRadius: '30px',
+        border: '2px solid rgba(0,255,198,0.5)',
+        color: '#00ffc6',
+        letterSpacing: '0.03em',
+        transition: 'all 0.22s',
+        position: 'relative',
+        zIndex: 2,
+        '&:hover': {
+          border: '2px solid #00ffc6',
+          backgroundColor: 'rgba(0,255,198,0.1)',
+          transform: 'translateY(-2px)',
+          boxShadow: '0 4px 20px rgba(0,255,198,0.3)'
+        }
+      }}
+    >
+      Watch Demo
+    </Button>
+  </Box>
 </Container>
       </Box>
 
