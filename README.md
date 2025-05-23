@@ -24,10 +24,8 @@ REACT_APP_BACKEND_URL=<your-backend-url>
 
 You can place them in a local `.env` file or configure them in your deployment environment.
 
-The `REACT_APP_BACKEND_URL` variable should point to your deployed backend on Render (e.g. `https://osbackend-zl1h.onrender.com`). The app uses this URL to create Stripe Checkout sessions when visitors click **Subscribe** in the call-to-action section.
+The `REACT_APP_BACKEND_URL` variable should point to your deployed backend on Render (e.g. `https://your-backend-service.onrender.com`). The app uses this URL to create Stripe Checkout sessions when visitors click **Subscribe** in the call-to-action section.
 
 ## Deploying to Netlify
 
 A basic configuration is provided in `netlify.toml`. Netlify should use the build command `npm run build:netlify` and publish the `build` folder. Be sure to add the `REACT_APP_SUPABASE_URL` and `REACT_APP_SUPABASE_KEY` variables in the Netlify UI under **Site settings → Environment variables**.
-
-
