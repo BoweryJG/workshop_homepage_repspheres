@@ -36,7 +36,7 @@ export default function IntelligenceSection() {
         fontFamily: "'Space Grotesk', Arial, sans-serif",
         animation: 'gradientMove 5s ease-in-out infinite alternate',
       }}>
-        Connected to over 300 advanced intelligence models.
+        Interactive dashboard with 300+ CDT/CPT codes.
       </Box>
       <Typography
         variant="h2"
@@ -65,8 +65,8 @@ export default function IntelligenceSection() {
           fontFamily: "'DM Sans', Arial, sans-serif",
         }}
       >
-        As a sales rep, you deserve more than just data—you deserve the world’s most powerful competitive edge. RepSpheres connects you to the largest, most comprehensive dataset in the dental and aesthetic industries, giving you real-time access to practice, physician, patient, and sales insights no one else can offer.<br /><br />
-        Instantly enrich your leads, generate custom content, and automate your outreach—so you can dominate your territory, grow your book, and win more business, faster.
+        Gain an unbeatable edge with real-time market intelligence and psychological enrichment. Our AI taps the nation’s largest dataset to deliver procedure volumes, pricing trends, and competitive intel down to the city level.<br /><br />
+        Instantly qualify leads, generate email campaigns, and produce actionable physician reports—all from one command center.
       </Typography>
       <Grid container spacing={4} justifyContent="center" sx={{ mb: 5 }}>
         <Grid item xs={12} md={4}>
@@ -87,10 +87,10 @@ export default function IntelligenceSection() {
             </Avatar>
             <CardContent>
               <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#fff', textAlign: 'center' }}>
-                AI-Powered Enrichment
+                Instant Psychological Enrichment
               </Typography>
               <Typography sx={{ color: 'rgba(255,255,255,0.85)', textAlign: 'center' }}>
-                Instantly enrich every lead with deep, actionable insights—powered by our massive data engine and 300+ intelligence models.
+                Profile every lead in seconds and surface the behavioral triggers that close deals.
               </Typography>
             </CardContent>
           </Card>
@@ -113,10 +113,10 @@ export default function IntelligenceSection() {
             </Avatar>
             <CardContent>
               <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#fff', textAlign: 'center' }}>
-                Built for Sales Reps
+                Interactive Procedure Dashboard
               </Typography>
               <Typography sx={{ color: 'rgba(255,255,255,0.85)', textAlign: 'center' }}>
-                The only platform designed for reps in the dental and aesthetic industries. Manage your book, your way—no company oversight, just your success.
+                Explore market size, pricing, and satisfaction for 300+ procedures—right inside your command center.
               </Typography>
             </CardContent>
           </Card>
@@ -139,10 +139,10 @@ export default function IntelligenceSection() {
             </Avatar>
             <CardContent>
               <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#fff', textAlign: 'center' }}>
-                Your Data, Fully Secure
+                Automated Email Outreach
               </Typography>
               <Typography sx={{ color: 'rgba(255,255,255,0.85)', textAlign: 'center' }}>
-                Your pipeline, your data. Encrypted, private, and always accessible—only by you—via Supabase cloud security.
+                Launch personalized campaigns and follow-ups directly from your Sphere and track engagement automatically.
               </Typography>
             </CardContent>
           </Card>

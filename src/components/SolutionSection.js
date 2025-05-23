@@ -4,18 +4,18 @@ import { Box, Container, Typography, Button } from '@mui/material';
 const solutions = [
   {
     icon: '⚡',
-    title: 'Instant Buyer Insights',
-    content: 'Know exactly what motivates each prospect—no guesswork, just results.'
+    title: 'Lead Qualification in Seconds',
+    content: 'Your hundred most qualified prospects delivered instantly—no more manual research.'
   },
   {
-    icon: '🤖',
-    title: 'Personalization at Scale',
-    content: 'Deliver messaging that feels tailor-made, every time, automatically.'
+    icon: '📊',
+    title: 'Procedure Intelligence',
+    content: 'Interactive dashboard mapping 300+ CDT/CPT codes with pricing and market growth.'
   },
   {
     icon: '🚀',
-    title: 'Seamless Automation',
-    content: 'Connect your tools, automate the busywork, and let your reps focus on selling.'
+    title: 'Automated Outreach',
+    content: 'Trigger personalized emails and tasks the moment new intelligence lands.'
   }
 ];
 
@@ -49,7 +49,7 @@ export default function SolutionSection() {
           fontSize: { xs: '1.08rem', md: '1.22rem' },
           color: 'rgba(255,255,255,0.92)'
         }}>
-          Give your team the power to move faster, personalize smarter, and close deals others miss—powered by psychological science and AI.
+          Automate research, surface procedure insights, and send targeted outreach—all from one streamlined hub.
         </Typography>
         <Box sx={{
           display: 'flex',

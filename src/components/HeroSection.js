@@ -81,21 +81,31 @@ export default function HeroSection() {
       }
     }}
   >
-    Pioneering the <Box component="span" sx={{
-      background: 'linear-gradient(90deg, #fff 10%, #00ffc6 50%, #7B42F6 90%)',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-      backgroundClip: 'text',
-      fontWeight: 900,
-      letterSpacing: '-0.01em',
-      textShadow: '0 2px 12px #00ffc688, 0 1px 0 #fff',
-      px: 0.5,
-      animation: 'shine 2.5s linear infinite alternate',
-      '@keyframes shine': {
-        '0%': { filter: 'brightness(1.1)' },
-        '100%': { filter: 'brightness(1.4)' }
-      }
-    }}>Data Revolution</Box> in Medical Aesthetics
+    Your
+    <Box
+      component="span"
+      sx={{
+        background: 'linear-gradient(90deg, #fff 10%, #00ffc6 50%, #7B42F6 90%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+        fontWeight: 900,
+        letterSpacing: '-0.01em',
+        textShadow: '0 2px 12px #00ffc688, 0 1px 0 #fff',
+        px: 0.5,
+        animation: 'shine 2.5s linear infinite alternate',
+        '@keyframes shine': {
+          '0%': { filter: 'brightness(1.1)' },
+          '100%': { filter: 'brightness(1.4)' }
+        }
+      }}
+    >
+      AI-Powered
+    </Box>
+    Sales Command Center
+    <Box component="span" sx={{ display: 'block' }}>
+      for Dental &amp; Aesthetic Practices
+    </Box>
   </Typography>
   <Typography
     variant="h6"
@@ -116,7 +126,7 @@ export default function HeroSection() {
       zIndex: 2,
     }}
   >
-    Unlocking the World's Largest Dental & Aesthetic Dataset | From the Pioneers Who Transformed the Industry
+    Real-time US dashboard, automated lead enrichment, and competitive intelligence—everything you need to win more deals.
   </Typography>
   <Button
     variant="contained"
