@@ -6,6 +6,7 @@ import PodcastPage from './PodcastPage';
 import LoginPage from './LoginPage';
 import SignupPage from './SignupPage';
 import reportWebVitals from './reportWebVitals';
+import { initAnalytics } from './analytics';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -18,6 +19,8 @@ if (path === '/podcast.html') {
 } else if (path === '/signup.html') {
   PageComponent = SignupPage;
 }
+
+initAnalytics();
 
 root.render(
   <React.StrictMode>
