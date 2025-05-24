@@ -572,15 +572,6 @@ export default function NavBar() {
           ml: 'auto',
           gap: { xs: 0.5, sm: 1 },
         }}>
-          {/* Theme Toggle - Subtle but visible */}
-          <Box sx={{
-            display: 'flex',
-            alignItems: 'center',
-            mr: 1,
-            opacity: 0.8,
-          }}>
-            <ThemeToggle />
-          </Box>
           
           {/* Auth Button or User Profile */}
           <Box sx={{
