@@ -20,6 +20,7 @@ The app expects environment variables to reach both the Supabase backend and you
 REACT_APP_SUPABASE_URL=<your-supabase-url>
 REACT_APP_SUPABASE_KEY=<your-supabase-key>
 REACT_APP_BACKEND_URL=<your-backend-url>
+REACT_APP_GA_ID=<your-ga-id>
 ```
 
 You can place them in a local `.env` file or configure them in your deployment environment.
@@ -28,4 +29,4 @@ The `REACT_APP_BACKEND_URL` variable should point to your deployed backend on Re
 
 ## Deploying to Netlify
 
-A basic configuration is provided in `netlify.toml`. Netlify should use the build command `npm run build:netlify` and publish the `build` folder. Be sure to add the `REACT_APP_SUPABASE_URL` and `REACT_APP_SUPABASE_KEY` variables in the Netlify UI under **Site settings → Environment variables**.
+A basic configuration is provided in `netlify.toml`. Netlify should use the build command `npm run build:netlify` and publish the `build` folder. Be sure to add the `REACT_APP_SUPABASE_URL`, `REACT_APP_SUPABASE_KEY` and `REACT_APP_GA_ID` variables in the Netlify UI under **Site settings → Environment variables**.
