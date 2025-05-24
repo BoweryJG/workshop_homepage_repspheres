@@ -5,6 +5,7 @@ import App from './App';
 import PodcastPage from './PodcastPage';
 import LoginPage from './LoginPage';
 import SignupPage from './SignupPage';
+import AdminAnalyticsPage from './AdminAnalyticsPage';
 import reportWebVitals from './reportWebVitals';
 import { initAnalytics } from './analytics';
 
@@ -18,6 +19,8 @@ if (path === '/podcast.html') {
   PageComponent = LoginPage;
 } else if (path === '/signup.html') {
   PageComponent = SignupPage;
+} else if (path === '/admin-analytics') {
+  PageComponent = AdminAnalyticsPage;
 }
 
 initAnalytics();

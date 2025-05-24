@@ -8,7 +8,8 @@ jest.mock('./contexts/AuthContext', () => ({
     loading: false,
     signInWithGoogle: jest.fn(),
     signInWithFacebook: jest.fn(),
-    signOut: jest.fn()
+    signOut: jest.fn(),
+    isAdmin: false
   }),
   AuthProvider: ({ children }) => children
 }));
