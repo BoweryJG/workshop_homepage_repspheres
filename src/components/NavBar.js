@@ -37,7 +37,7 @@ import AuthModal from './AuthModal';
 const ACCENT_COLOR = '#00ffc6';
 
 // Main navigation links
-const getNavLinks = (currentUrl) => {
+const getNavLinks = (currentUrl, isAdmin) => {
   const links = [
     { 
       key: 'insights',
@@ -65,6 +65,15 @@ const getNavLinks = (currentUrl) => {
       icon: <PodcastsIcon fontSize="small" sx={{ color: ACCENT_COLOR }} />
     },
   ];
+
+  if (isAdmin) {
+    links.push({
+      key: 'analytics',
+      label: 'Analytics',
+      href: '/admin-analytics',
+      icon: <InsightsIcon fontSize="small" sx={{ color: ACCENT_COLOR }} />,
+    });
+  }
 
   // Show Linguistics link only if not on the linguistics page
   if (!currentUrl.includes('/linguistics')) {
@@ -106,13 +115,13 @@ export default function NavBar() {
   const isXXS = useMediaQuery('(max-width:320px)');
   
   // Get authentication context
-  const { user, loading, signInWithGoogle, signInWithFacebook, signOut } = useAuth();
+  const { user, loading, signInWithGoogle, signInWithFacebook, signOut, isAdmin } = useAuth();
   
   // Get current URL to determine which page we're on
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
 
   // Get navigation links based on current page
-  const navLinks = getNavLinks(currentUrl);
+  const navLinks = getNavLinks(currentUrl, isAdmin);
   
   // Get the gradient colors from context
   const { gradientColors } = useOrbContext();

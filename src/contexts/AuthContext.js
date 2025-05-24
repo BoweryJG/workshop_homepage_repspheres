@@ -14,6 +14,7 @@ export function AuthProvider({ children }) {
   // State for the current user
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Function to sign in with Google
   const signInWithGoogle = async () => {
@@ -95,10 +96,30 @@ export function AuthProvider({ children }) {
     initializeAuth();
   }, []);
 
+  // Determine admin status whenever user changes
+  useEffect(() => {
+    if (!user) {
+      setIsAdmin(false);
+      return;
+    }
+    const adminEmails = (process.env.REACT_APP_ADMIN_EMAILS || '')
+      .split(',')
+      .map((e) => e.trim())
+      .filter(Boolean);
+    if (adminEmails.includes(user.email)) {
+      setIsAdmin(true);
+    } else if (user.user_metadata?.role === 'admin') {
+      setIsAdmin(true);
+    } else {
+      setIsAdmin(false);
+    }
+  }, [user]);
+
   // Values to provide through the context
   const value = {
     user,
     loading,
+    isAdmin,
     signInWithGoogle,
     signInWithFacebook,
     signOut,
