@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import Box from '@mui/material/Box';
+import { useOrbContext } from './OrbContextProvider';
 
 const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) => {
   const svgRef = useRef(null);
@@ -17,17 +18,26 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
   const orbScaleRef = useRef(1);
   const lastWheelTimeRef = useRef(0);
   const animationFrameIdRef = useRef(null);
+  
+  // New refs for enhanced features
+  const scrollPositionRef = useRef(0);
+  // const titleLetterBoundsRef = useRef([]); // Removed
+  // const letterParticlesRef = useRef([]); // Removed
+  // const explodedLettersRef = useRef(new Set()); // Removed
+  const orbReturnAnimationsRef = useRef([]);
+  const mousePositionRef = useRef({ x: 0, y: 0 });
+  const isHeroVisibleRef = useRef(true);
+  const dataTransmissionsRef = useRef([]);
 
   const childCount = 5;
-  const parentRadius = 80; // Reduced from 100
-  const childRadius = 29; // Reduced from 36 (approx 20% reduction)
-  const childPoints = 48; // This was a constant in the HTML, not an array
-  const childAmp = 0.5;   // This was a constant in the HTML
+  const parentRadius = 64; // Reduced by 20% from 80
+  const childRadius = 23; // Reduced by 20% from 29
+  const childPoints = 48;
+  const childAmp = 0.5;
   const orbMorphDirections = [];
   const orbMorphSpeeds = [];
 
-
-  // --- Utility functions (from HTML) ---
+  // --- Utility functions ---
   const hslToHex = (h, s, l) => {
     h /= 360; s /= 100; l /= 100;
     let r, g, b;
@@ -64,10 +74,11 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
     const pts = [];
     for (let i = 0; i < points; i++) {
       const angle = (Math.PI * 2 * i) / points;
+      // Reduced amplitude for more sphere-like shape
       const noise =
-        Math.sin(angle * 3 + t * 0.7 + phase) * 4 * amp +
-        Math.sin(angle * 5 - t * 1.1 + phase) * 2 * amp +
-        Math.sin(angle * 2 + t * 1.7 + phase) * 1.2 * amp;
+        Math.sin(angle * 3 + t * 0.7 + phase) * 1.5 * amp +
+        Math.sin(angle * 5 - t * 1.1 + phase) * 0.8 * amp +
+        Math.sin(angle * 2 + t * 1.7 + phase) * 0.5 * amp;
       const rad = r + noise;
       pts.push({
         x: cx + Math.cos(angle) * rad,
@@ -136,10 +147,115 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
     }
   };
 
+  // Generate lightning bolt path between two points
+  const generateLightningPath = (x1, y1, x2, y2, segments = 5) => {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    let path = `M${x1.toFixed(2)},${y1.toFixed(2)}`;
+    
+    for (let i = 1; i < segments; i++) {
+      const t = i / segments;
+      const x = x1 + dx * t;
+      const y = y1 + dy * t;
+      
+      // Add perpendicular offset for lightning effect
+      const perpX = -dy / distance;
+      const perpY = dx / distance;
+      const offset = (Math.random() - 0.5) * 15 * Math.sin(t * Math.PI);
+      
+      const px = x + perpX * offset;
+      const py = y + perpY * offset;
+      
+      path += ` L${px.toFixed(2)},${py.toFixed(2)}`;
+    }
+    
+    path += ` L${x2.toFixed(2)},${y2.toFixed(2)}`;
+    return path;
+  };
+
+  // Create data transmission effect
+  const createDataTransmission = (childIndex, parentX, parentY, childX, childY, color) => {
+    if (!dataTransmissionsRef.current) dataTransmissionsRef.current = [];
+    
+    dataTransmissionsRef.current.push({
+      childIndex,
+      startX: childX,
+      startY: childY,
+      endX: parentX,
+      endY: parentY,
+      progress: 0,
+      life: 1,
+      color,
+      direction: Math.random() > 0.5 ? 1 : -1, // 1 for child to parent, -1 for parent to child
+    });
+  };
+
+  const animateDataTransmissions = () => {
+    const transmissionsGroup = svgRef.current?.querySelector('#dataTransmissions');
+    if (!transmissionsGroup) return;
+    
+    // Clear previous transmissions
+    transmissionsGroup.innerHTML = '';
+    
+    // Update and draw active transmissions
+    dataTransmissionsRef.current = dataTransmissionsRef.current.filter(t => t.life > 0);
+    
+    for (const transmission of dataTransmissionsRef.current) {
+      transmission.progress += 0.03;
+      transmission.life = 1 - transmission.progress;
+      
+      if (transmission.life > 0) {
+        const t = transmission.direction === 1 ? transmission.progress : 1 - transmission.progress;
+        
+        // Create lightning path
+        const path = generateLightningPath(
+          transmission.startX,
+          transmission.startY,
+          transmission.endX,
+          transmission.endY,
+          4 + Math.floor(Math.random() * 3)
+        );
+        
+        const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        pathEl.setAttribute("d", path);
+        pathEl.setAttribute("fill", "none");
+        pathEl.setAttribute("stroke", transmission.color);
+        pathEl.setAttribute("stroke-width", (1.5 * transmission.life).toFixed(2));
+        pathEl.setAttribute("opacity", (transmission.life * 0.8).toFixed(2));
+        pathEl.setAttribute("filter", "url(#glow)");
+        
+        transmissionsGroup.appendChild(pathEl);
+        
+        // Add bright spot at current position
+        const currentX = transmission.startX + (transmission.endX - transmission.startX) * t;
+        const currentY = transmission.startY + (transmission.endY - transmission.startY) * t;
+        
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", currentX.toFixed(2));
+        circle.setAttribute("cy", currentY.toFixed(2));
+        circle.setAttribute("r", (3 * transmission.life).toFixed(2));
+        circle.setAttribute("fill", transmission.color);
+        circle.setAttribute("opacity", transmission.life.toFixed(2));
+        
+        transmissionsGroup.appendChild(circle);
+      }
+    }
+  };
+
+  // Removed emitLetterParticles, checkOrbLetterCollision, updateTitleLetterBounds
+
   const animateParticles = () => {
-    if (!particlesGroupRef.current || !particlesRef.current) return;
+    if (!particlesGroupRef.current) return;
+    
+    // Regular particles
     particlesRef.current = particlesRef.current.filter(p => p.life > 0);
-    particlesGroupRef.current.innerHTML = ''; // Clear previous particles
+    
+    // Clear and redraw all particles
+    particlesGroupRef.current.innerHTML = '';
+    
+    // Draw regular particles
     for (const p of particlesRef.current) {
       p.x += p.vx;
       p.y += p.vy;
@@ -147,6 +263,7 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       p.vy *= 0.98;
       p.life -= p.decay;
       p.opacity = Math.max(0, p.life);
+      
       const circ = document.createElementNS("http://www.w3.org/2000/svg", "circle");
       circ.setAttribute("cx", p.x.toFixed(2));
       circ.setAttribute("cy", p.y.toFixed(2));
@@ -157,9 +274,14 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
     }
   };
 
+  // Get the context to update gradient colors
+  const { updateGradientColors } = useOrbContext();
+
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
+
+    // window.explodedLettersSet = explodedLettersRef.current; // Removed
 
     parentOrbRef.current = svg.querySelector('#parentOrb');
     childrenGroupRef.current = svg.querySelector('#children');
@@ -170,6 +292,8 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       squash: 0, squashTarget: 0, squashV: 0,
       mouseDir: 0, mouseDirTarget: 0, mouseDirV: 0,
       wobble: 0, lastUpdate: performance.now(),
+      parallaxOffset: 0, parallaxVelocity: 0,
+      isReturning: false, returnProgress: 0,
     });
 
     orbMorphDirections.length = 0;
@@ -185,10 +309,9 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
     orbStatesRef.current = [makeOrbState()]; // Parent
     childOrbsRef.current = [];
     if (childrenGroupRef.current) {
-        childrenGroupRef.current.innerHTML = ''; // Clear previous children if any
+        childrenGroupRef.current.innerHTML = '';
         for (let i = 0; i < childCount; i++) {
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            // Initial fill, will be updated in animate loop
             path.setAttribute("fill", `url(#childGrad${i})`); 
             path.setAttribute("opacity", "0.95");
             childrenGroupRef.current.appendChild(path);
@@ -196,7 +319,6 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
             orbStatesRef.current.push(makeOrbState());
         }
     }
-
 
     const adjustSVGSize = () => {
       const vw = window.innerWidth;
@@ -213,13 +335,75 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       svg.setAttribute('height', vh.toString());
       svg.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
       
-      parentCenterBaseRef.current = { x: vw / 2, y: vh * 0.35 }; // Moved up from vh / 2
-      parentCenterRef.current = { x: vw / 2, y: vh * 0.35 }; // Moved up from vh / 2
+      parentCenterBaseRef.current = { x: vw / 2, y: vh * 0.15 }; // Further adjusted Y position
+      parentCenterRef.current = { x: vw / 2, y: vh * 0.15 }; // Further adjusted Y position
       orbScaleRef.current = scale;
     };
 
     adjustSVGSize();
     window.addEventListener('resize', adjustSVGSize);
+
+    // Mouse move handler for cursor effect
+    const handleMouseMove = (e) => {
+      const svg = svgRef.current;
+      if (!svg) return;
+      
+      const rect = svg.getBoundingClientRect();
+      mousePositionRef.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    // Enhanced scroll handling with parallax
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const scrollDelta = scrollY - scrollPositionRef.current;
+      scrollPositionRef.current = scrollY;
+      
+      const heroHeight = window.innerHeight;
+      const scrollProgress = Math.min(scrollY / heroHeight, 1);
+      
+      // Check if hero is visible
+      const heroElement = document.querySelector('[data-hero-section]');
+      if (heroElement) {
+        const rect = heroElement.getBoundingClientRect();
+        isHeroVisibleRef.current = rect.bottom > 0 && rect.top < window.innerHeight;
+      }
+      
+      // Apply parallax to child orbs
+      orbStatesRef.current.forEach((state, i) => {
+        if (i === 0) return; // Skip parent orb
+        
+        const parallaxFactor = 0.3 + (i * 0.1);
+        const targetParallax = scrollY * parallaxFactor;
+        
+        // Check if orb should start returning when scrolling back up
+        if (isHeroVisibleRef.current && scrollProgress < 0.5) {
+          if (!state.isReturning && state.parallaxOffset > 20) {
+            state.isReturning = true;
+            state.returnProgress = 0;
+          }
+        }
+        
+        if (state.isReturning) {
+          state.returnProgress += 0.03;
+          const returnSpeed = 0.15 + state.returnProgress * 0.4;
+          state.parallaxOffset += (0 - state.parallaxOffset) * returnSpeed;
+          
+          if (Math.abs(state.parallaxOffset) < 2) {
+            state.isReturning = false;
+            state.parallaxOffset = 0;
+          }
+        } else if (scrollProgress > 0.1 && !isHeroVisibleRef.current) {
+          state.parallaxOffset += (targetParallax - state.parallaxOffset) * 0.1;
+        }
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll);
 
     const handleWheel = (e) => {
       const now = performance.now();
@@ -230,18 +414,18 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       orbStatesRef.current.forEach((state, i) => {
         if (orbMorphDirections[i] !== undefined) {
             const angle = orbMorphDirections[i];
-            // Add randomness to the scroll effect for dispersion
-            const randomFactor = 0.5 + Math.random(); // Randomness between 0.5 and 1.5
+            const randomFactor = 0.5 + Math.random();
             state.dragTarget += (Math.sin(angle) * velocity * 1.8 + Math.cos(angle) * velocity * 0.7) * randomFactor;
         }
       });
       e.preventDefault();
     };
     
-    // Use svgRef.current for wheel listener if you want it localized, or window
-    const eventTarget = svg; // Or window
+    const eventTarget = svg;
     eventTarget.addEventListener('wheel', handleWheel, { passive: false });
 
+    // Removed initial update of title bounds
+    // setTimeout(updateTitleLetterBounds, 100); 
 
     const animate = () => {
       if (!svgRef.current || !parentOrbRef.current || !childrenGroupRef.current || !particlesGroupRef.current) {
@@ -250,11 +434,19 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       }
 
       const now = performance.now();
+      
+      // Update gradient colors in context for navbar orb
+      const baseHue = (now * 0.01) % 360;
+      const startHue = baseHue;
+      const endHue = (baseHue + 60 * Math.sin(now * 0.00015 + Math.PI * 0.5)) % 360;
+      const startColor = hslToHex(startHue, 80, 60);
+      const endColor = hslToHex(endHue, 80, 60);
+      updateGradientColors({ start: startColor, end: endColor });
+      
       const parentStops = [
         { id: "p0", phase: 0 }, { id: "p1", phase: Math.PI * 0.5 },
         { id: "p2", phase: Math.PI }, { id: "p3", phase: Math.PI * 1.5 }
       ];
-      const baseHue = (now * 0.01) % 360;
       for (let i = 0; i < parentStops.length; i++) {
         const stop = parentStops[i];
         const hue = (baseHue + 60 * Math.sin(now * 0.00015 + stop.phase)) % 360;
@@ -289,8 +481,23 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
         const scale = orbScaleRef.current || 1;
         
         const { vw, vh } = viewportSizeRef.current;
-        const px = parentCenterBaseRef.current.x + Math.sin(now * 0.00011) * vw * 0.09 + Math.cos(now * 0.00007) * vw * 0.07;
-        const py = parentCenterBaseRef.current.y + Math.cos(now * 0.00009) * vh * 0.08 + Math.sin(now * 0.00016) * vh * 0.06;
+        // Add cursor effect to parent orb position
+        const mouseX = mousePositionRef.current.x;
+        const mouseY = mousePositionRef.current.y;
+        const mouseDx = mouseX - parentCenterBaseRef.current.x;
+        const mouseDy = mouseY - parentCenterBaseRef.current.y;
+        const mouseDistance = Math.sqrt(mouseDx * mouseDx + mouseDy * mouseDy);
+        const maxMouseEffect = 30;
+        const mouseEffect = Math.max(0, 1 - mouseDistance / 300) * maxMouseEffect;
+        
+        const px = parentCenterBaseRef.current.x + 
+                   Math.sin(now * 0.00011) * vw * 0.09 + 
+                   Math.cos(now * 0.00007) * vw * 0.07 +
+                   (mouseDx / mouseDistance || 0) * mouseEffect;
+        const py = parentCenterBaseRef.current.y + 
+                   Math.cos(now * 0.00009) * vh * 0.08 + 
+                   Math.sin(now * 0.00016) * vh * 0.06 +
+                   (mouseDy / mouseDistance || 0) * mouseEffect;
         parentCenterRef.current = { x: px, y: py };
 
         const parentR = (parentRadius + parentDrag * 0.15) * scale;
@@ -300,7 +507,6 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       }
 
       if (childrenGroupRef.current && childOrbsRef.current.length === childCount) {
-         // childrenGroupRef.current.innerHTML = ''; // Moved to setup
         for (let i = 0; i < childCount; i++) {
           const state = orbStatesRef.current[i + 1];
           if (!state || orbMorphDirections[i+1] === undefined) continue;
@@ -335,17 +541,32 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           const dx = Math.cos(dragAngle) * state.drag;
           const dy = Math.sin(dragAngle) * state.drag;
           
-          const x = parentCenterRef.current.x + Math.cos(angle) * ellipseA + dx;
-          const y = parentCenterRef.current.y + Math.sin(angle) * ellipseB + dy;
+          // Apply parallax offset
+          const parallaxY = state.parallaxOffset * (1 + i * 0.2);
+          const parallaxX = state.parallaxOffset * 0.3 * Math.sin(i);
+          
+          // Add cursor effect to child orbs
+          const childMouseDx = mousePositionRef.current.x - (parentCenterRef.current.x + Math.cos(angle) * ellipseA);
+          const childMouseDy = mousePositionRef.current.y - (parentCenterRef.current.y + Math.sin(angle) * ellipseB);
+          const childMouseDistance = Math.sqrt(childMouseDx * childMouseDx + childMouseDy * childMouseDy);
+          const childMouseEffect = Math.max(0, 1 - childMouseDistance / 200) * 20 * (1 - i * 0.1);
+          
+          const x = parentCenterRef.current.x + 
+                    Math.cos(angle) * ellipseA + 
+                    dx + parallaxX +
+                    (childMouseDx / childMouseDistance || 0) * childMouseEffect;
+          const y = parentCenterRef.current.y + 
+                    Math.sin(angle) * ellipseB + 
+                    dy + parallaxY +
+                    (childMouseDy / childMouseDistance || 0) * childMouseEffect;
           
           const scale = orbScaleRef.current || 1;
           const cR = (childRadius + state.drag * 0.08) * scale;
           const currentChildAmp = (childAmp + Math.abs(state.drag) * 0.006) * scale;
           const morphT = now * 0.0005 + i * 10;
           
-          // The HTML version scales x,y coordinates with scale and offsets by parentCenter.
-          // This might be an artifact of a different coordinate system setup.
-          // For React, usually, the viewBox handles scaling. Let's try to apply scale to radius and amplitude only.
+          // Removed checkOrbLetterCollision(x, y, cR);
+          
           const childPath = generateSuperSmoothBlob(x, y, cR, childPoints, morphT, currentChildAmp, i);
           
           const path = childOrbsRef.current[i];
@@ -358,11 +579,10 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
 
             if (state.wasVisible === undefined) state.wasVisible = fade > 0.5;
 
-            if (!state.wasVisible && fade > 0.05 && fade < 0.7) { // Orb is reassembling
-              // Come from further down and smaller, then grow and move to position
-              const reassemblyProgress = fade / 0.7; // 0 to 1 as it fades in
-              reassemblyOffsetY = (1 - reassemblyProgress) * (vh * 0.3); // Start further down
-              reassemblyScaleFactor = 0.5 + reassemblyProgress * 0.5; // Start smaller
+            if (!state.wasVisible && fade > 0.05 && fade < 0.7) {
+              const reassemblyProgress = fade / 0.7;
+              reassemblyOffsetY = (1 - reassemblyProgress) * (vh * 0.3);
+              reassemblyScaleFactor = 0.5 + reassemblyProgress * 0.5;
             }
             
             const finalX = x;
@@ -373,28 +593,45 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
             const reassembledChildPath = generateSuperSmoothBlob(finalX, finalY, finalCR, childPoints, morphT, finalChildAmp, i);
             path.setAttribute("d", reassembledChildPath);
 
-            if (fade < 0.5 && fade > 0.05) {
+            // Adjust opacity based on parallax and hero visibility
+            let parallaxFade = 1;
+            if (!isHeroVisibleRef.current && !state.isReturning) {
+              parallaxFade = Math.max(0, 1 - (state.parallaxOffset / (viewportSizeRef.current.vh * 0.3)));
+            } else if (state.isReturning) {
+              parallaxFade = 0.3 + state.returnProgress * 0.7;
+            }
+            
+            const finalOpacity = fade * 0.95 * Math.max(0.2, Math.min(1, parallaxFade));
+
+            if (fade < 0.5 && fade > 0.05 && !state.isReturning) {
               const color = lerpColor(fam[0], fam[1], tcol);
               const emission = Math.ceil((0.5 - fade) * 12);
               emitParticles(finalX, finalY, color, emission, i, now);
-              path.setAttribute("opacity", (fade * 0.95).toFixed(2));
+              path.setAttribute("opacity", finalOpacity.toFixed(2));
             } else if (state.wasVisible && fade <= 0.05) {
               const color = lerpColor(fam[0], fam[1], tcol);
-              emitParticles(finalX, finalY, color, 12, i, now); // Use finalX, finalY for particle emission
+              emitParticles(finalX, finalY, color, 12, i, now);
               path.setAttribute("opacity", "0");
               state.wasVisible = false;
             } else if (!state.wasVisible && fade > 0.05) {
               const color = lerpColor(fam[0], fam[1], tcol);
               emitParticles(finalX, finalY, color, 9, i, now);
-              path.setAttribute("opacity", (fade * 0.95).toFixed(2));
+              path.setAttribute("opacity", finalOpacity.toFixed(2));
               state.wasVisible = true;
             } else {
-              path.setAttribute("opacity", (fade * 0.95).toFixed(2));
+              path.setAttribute("opacity", finalOpacity.toFixed(2));
+            }
+            
+            // Intermittently create data transmissions
+            if (Math.random() < 0.002 && fade > 0.8 && isHeroVisibleRef.current) {
+              const color = lerpColor(fam[0], fam[1], tcol);
+              createDataTransmission(i, parentCenterRef.current.x, parentCenterRef.current.y, finalX, finalY, color);
             }
           }
         }
       }
       animateParticles();
+      animateDataTransmissions();
       animationFrameIdRef.current = requestAnimationFrame(animate);
     };
 
@@ -402,6 +639,8 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
 
     return () => {
       window.removeEventListener('resize', adjustSVGSize);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('mousemove', handleMouseMove);
       if (eventTarget) {
         eventTarget.removeEventListener('wheel', handleWheel);
       }
@@ -409,7 +648,7 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
         cancelAnimationFrame(animationFrameIdRef.current);
       }
     };
-  }, []); // Empty dependency array to run only on mount and unmount
+  }, [updateGradientColors]); // Include updateGradientColors in dependency array
 
   return (
     <Box
@@ -430,8 +669,8 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
     >
       <svg 
         ref={svgRef} 
-        id="orbSVG" // Keep ID for consistency if any internal logic relies on it (though refs are preferred)
-        // width, height, viewBox will be set by adjustSVGSize
+        id="orbSVG"
+        style={{ width: '100%', height: '100%' }}
       >
         <defs>
           <radialGradient id="parentGrad" cx="50%" cy="50%" r="70%">
@@ -460,10 +699,18 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
             <stop id="c4s0" offset="0%" stopColor="#FFF5B3"/>
             <stop id="c4s1" offset="100%" stopColor="#4B3800"/>
           </radialGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
         </defs>
-        <g id="particles"></g> {/* ref is particlesGroupRef */}
-        <path id="parentOrb" fill="url(#parentGrad)" opacity="0.95"/> {/* ref is parentOrbRef */}
-        <g id="children"></g> {/* ref is childrenGroupRef */}
+        <g id="particles"></g>
+        <g id="dataTransmissions"></g>
+        <path id="parentOrb" fill="url(#parentGrad)" opacity="0.95"/>
+        <g id="children"></g>
       </svg>
     </Box>
   );
