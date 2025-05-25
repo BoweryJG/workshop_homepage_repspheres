@@ -13,13 +13,13 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 const path = window.location.pathname;
 let PageComponent = App;
-if (path === '/podcast.html' || path === '/podcast') {
+if (path.startsWith('/podcast')) {
   PageComponent = PodcastPage;
-} else if (path === '/login.html') {
+} else if (path.startsWith('/login')) {
   PageComponent = LoginPage;
-} else if (path === '/signup.html') {
+} else if (path.startsWith('/signup')) {
   PageComponent = SignupPage;
-} else if (path === '/admin-analytics') {
+} else if (path.startsWith('/admin-analytics')) {
   PageComponent = AdminAnalyticsPage;
 }
 
