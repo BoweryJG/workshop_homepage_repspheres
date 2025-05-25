@@ -17,7 +17,8 @@ export default function InfoModal({
   onClose, 
   title, 
   maxWidth = 'sm',
-  children 
+  children,
+  hideCloseButton = false 
 }) {
   return (
     <Dialog
@@ -46,20 +47,22 @@ export default function InfoModal({
         fontWeight: 600
       }}>
         {title}
-        <IconButton 
-          onClick={onClose} 
-          aria-label="close"
-          sx={{ 
-            color: 'white',
-            opacity: 0.7,
-            '&:hover': {
-              opacity: 1,
-              backgroundColor: 'rgba(255,255,255,0.1)'
-            } 
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
+        {!hideCloseButton && (
+          <IconButton 
+            onClick={onClose} 
+            aria-label="close"
+            sx={{ 
+              color: 'white',
+              opacity: 0.7,
+              '&:hover': {
+                opacity: 1,
+                backgroundColor: 'rgba(255,255,255,0.1)'
+              } 
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        )}
       </DialogTitle>
       
       <DialogContent sx={{ py: 3, px: 3 }}>

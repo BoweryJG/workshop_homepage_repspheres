@@ -46,6 +46,68 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Function to sign in with email and password
+  const signInWithEmail = async (email, password) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error signing in with email:', error.message);
+      throw error;
+    }
+  };
+
+  // Function to sign up with email and password
+  const signUpWithEmail = async (email, password, metadata = {}) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: metadata,
+        },
+      });
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error signing up with email:', error.message);
+      throw error;
+    }
+  };
+
+  // Function to reset password
+  const resetPassword = async (email) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error resetting password:', error.message);
+      throw error;
+    }
+  };
+
+  // Generic function to sign in with any OAuth provider
+  const signInWithProvider = async (provider) => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: window.location.origin,
+        },
+      });
+      if (error) throw error;
+    } catch (error) {
+      console.error(`Error signing in with ${provider}:`, error.message);
+      throw error;
+    }
+  };
+
   // Function to sign out
   const signOut = async () => {
     try {
@@ -122,6 +184,10 @@ export function AuthProvider({ children }) {
     isAdmin,
     signInWithGoogle,
     signInWithFacebook,
+    signInWithEmail,
+    signUpWithEmail,
+    resetPassword,
+    signInWithProvider,
     signOut,
   };
 
