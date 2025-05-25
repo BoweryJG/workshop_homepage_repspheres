@@ -37,6 +37,8 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
   const parentCenterRef = useRef({ x: 400, y: 400 });
   const orbScaleRef = useRef(1);
   const lastWheelTimeRef = useRef(0);
+  // track time of last frame for throttling
+  const lastFrameTimeRef = useRef(0);
   const animationFrameIdRef = useRef(null);
   
   // New refs for enhanced features
@@ -52,7 +54,7 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
   const childCount = 5;
   const parentRadius = 64; // Reduced by 20% from 80
   const childRadius = 23; // Reduced by 20% from 29
-  const childPoints = 48;
+  const childPoints = 36; // slightly lower complexity
   const childAmp = 0.5;
   const orbMorphDirections = [];
   const orbMorphSpeeds = [];
@@ -146,7 +148,7 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
     return [current, velocity];
   };
 
-  const emitParticles = (x, y, color, count = 3, i = 0, now = 0) => {
+  const emitParticles = (x, y, color, count = 2, i = 0, now = 0) => {
     if (!particlesRef.current) particlesRef.current = [];
     for (let j = 0; j < count; j++) {
       let h = (i * 67 + now * 0.018) % 360 + (Math.random() - 0.5) * 24;
@@ -385,7 +387,6 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
     // Enhanced scroll handling with parallax
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      const scrollDelta = scrollY - scrollPositionRef.current;
       scrollPositionRef.current = scrollY;
       
       const heroHeight = window.innerHeight;
@@ -395,7 +396,11 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       const heroElement = document.querySelector('[data-hero-section]');
       if (heroElement) {
         const rect = heroElement.getBoundingClientRect();
+        const prev = isHeroVisibleRef.current;
         isHeroVisibleRef.current = rect.bottom > 0 && rect.top < window.innerHeight;
+        if (!prev && isHeroVisibleRef.current && !animationFrameIdRef.current) {
+          animationFrameIdRef.current = requestAnimationFrame(animate);
+        }
       }
       
       // Apply parallax to child orbs
@@ -458,7 +463,18 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
         return;
       }
 
+      // stop updates when hero is off screen
+      if (!isHeroVisibleRef.current) {
+        animationFrameIdRef.current = null;
+        return;
+      }
+
       const now = performance.now();
+      if (now - lastFrameTimeRef.current < 33) {
+        animationFrameIdRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      lastFrameTimeRef.current = now;
       
       // Update gradient colors in context for navbar orb
       const baseHue = (now * 0.01) % 360;
@@ -630,17 +646,17 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
 
             if (fade < 0.5 && fade > 0.05 && !state.isReturning) {
               const color = lerpColor(fam[0], fam[1], tcol);
-              const emission = Math.ceil((0.5 - fade) * 12);
+            const emission = Math.ceil((0.5 - fade) * 8);
               emitParticles(finalX, finalY, color, emission, i, now);
               path.setAttribute("opacity", finalOpacity.toFixed(2));
             } else if (state.wasVisible && fade <= 0.05) {
               const color = lerpColor(fam[0], fam[1], tcol);
-              emitParticles(finalX, finalY, color, 12, i, now);
+              emitParticles(finalX, finalY, color, 6, i, now);
               path.setAttribute("opacity", "0");
               state.wasVisible = false;
             } else if (!state.wasVisible && fade > 0.05) {
               const color = lerpColor(fam[0], fam[1], tcol);
-              emitParticles(finalX, finalY, color, 9, i, now);
+              emitParticles(finalX, finalY, color, 5, i, now);
               path.setAttribute("opacity", finalOpacity.toFixed(2));
               state.wasVisible = true;
             } else {
