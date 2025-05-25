@@ -2,6 +2,26 @@ import React, { useEffect, useRef } from 'react';
 import Box from '@mui/material/Box';
 import { useOrbContext } from './OrbContextProvider';
 
+// Cache trig tables so we don't recalc sines/cosines each frame
+const trigTableCache = new Map();
+
+const getTrigTables = (points) => {
+  const cached = trigTableCache.get(points);
+  if (cached) return cached;
+  const angles = new Array(points);
+  const sin = new Array(points);
+  const cos = new Array(points);
+  for (let i = 0; i < points; i++) {
+    const angle = (Math.PI * 2 * i) / points;
+    angles[i] = angle;
+    sin[i] = Math.sin(angle);
+    cos[i] = Math.cos(angle);
+  }
+  const tables = { angles, sin, cos };
+  trigTableCache.set(points, tables);
+  return tables;
+};
+
 const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) => {
   const svgRef = useRef(null);
   const parentOrbRef = useRef(null);
@@ -71,9 +91,10 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
   };
 
   const generateSuperSmoothBlob = (cx, cy, r, points, t, amp = 1, phase = 0) => {
+    const { angles, sin, cos } = getTrigTables(points);
     const pts = [];
     for (let i = 0; i < points; i++) {
-      const angle = (Math.PI * 2 * i) / points;
+      const angle = angles[i];
       // Reduced amplitude for more sphere-like shape
       const noise =
         Math.sin(angle * 3 + t * 0.7 + phase) * 1.5 * amp +
@@ -81,8 +102,8 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
         Math.sin(angle * 2 + t * 1.7 + phase) * 0.5 * amp;
       const rad = r + noise;
       pts.push({
-        x: cx + Math.cos(angle) * rad,
-        y: cy + Math.sin(angle) * rad
+        x: cx + cos[i] * rad,
+        y: cy + sin[i] * rad
       });
     }
     let d = "";
@@ -280,6 +301,10 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
+
+    // Precompute trig tables for parent and child point counts
+    getTrigTables(64);
+    getTrigTables(childPoints);
 
     // window.explodedLettersSet = explodedLettersRef.current; // Removed
 
