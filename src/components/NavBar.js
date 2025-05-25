@@ -81,7 +81,7 @@ const getNavLinks = (currentUrl, isAdmin) => {
     {
       key: 'podcast',
       label: 'Podcast',
-      href: '/podcast.html',
+      href: '/podcast',
       icon: <PodcastsIcon fontSize="small" sx={{ color: ACCENT_COLOR }} />,
       description: 'Industry insights & interviews'
     },
@@ -109,7 +109,7 @@ const getNavLinks = (currentUrl, isAdmin) => {
   }
 
   // Hide podcast link when already on the podcast page
-  if (currentUrl.includes('/podcast.html')) {
+  if (currentUrl.includes('/podcast')) {
     return links.filter((l) => l.key !== 'podcast');
   }
 

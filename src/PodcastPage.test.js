@@ -20,7 +20,7 @@ beforeAll(() => {
   // Save the original window.location
   delete window.location;
   // Set up our mock
-  window.location = new URL('https://repspheres.com/podcast.html');
+  window.location = new URL('https://repspheres.com/podcast');
 });
 
 afterAll(() => {
