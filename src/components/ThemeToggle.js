@@ -8,23 +8,24 @@ import InvertColorsIcon from '@mui/icons-material/InvertColors';
 export default function ThemeToggle() {
   const [active, setActive] = useState(false);
 
+  // Initialize from localStorage
   useEffect(() => {
     const stored = localStorage.getItem('invertedTheme') === 'true';
     setActive(stored);
-    if (stored) {
-      document.body.classList.add('inverted-theme');
-    }
   }, []);
 
-  const handleToggle = () => {
-    const newVal = !active;
-    setActive(newVal);
-    if (newVal) {
+  // Update DOM and storage whenever active changes
+  useEffect(() => {
+    if (active) {
       document.body.classList.add('inverted-theme');
     } else {
       document.body.classList.remove('inverted-theme');
     }
-    localStorage.setItem('invertedTheme', newVal);
+    localStorage.setItem('invertedTheme', active);
+  }, [active]);
+
+  const handleToggle = () => {
+    setActive((prev) => !prev);
   };
 
   return (
