@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Container } from '@mui/material';
+import { Box } from '@mui/material';
 import NavBar from './components/NavBar';
 import StarryBackground from './components/StarryBackground';
 import OrbContextProvider from './components/OrbContextProvider';
 import Podcasts from './components/Podcasts';
+import PodcastHero from './components/PodcastHero';
+import Footer from './components/Footer';
+import ThemeToggle from './components/ThemeToggle';
 
 const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
 const SUPABASE_KEY = process.env.REACT_APP_SUPABASE_KEY;
@@ -37,24 +40,12 @@ export default function PodcastPage() {
     <OrbContextProvider>
       <StarryBackground />
       <NavBar />
-      <Box
-        sx={{
-          py: { xs: 8, md: 12 },
-          background: 'linear-gradient(135deg, #7B42F6 0%, #00ffc6 100%)',
-          color: '#fff',
-          textAlign: 'center',
-        }}
-      >
-        <Container maxWidth="md">
-          <Typography variant="h2" fontWeight={800} gutterBottom>
-            RepSpheres Podcast
-          </Typography>
-          <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.9)' }}>
-            Insights, interviews and strategies for elite sales reps.
-          </Typography>
-        </Container>
+      <PodcastHero />
+      <Box id="episodes">
+        <Podcasts episodes={episodes} />
       </Box>
-      <Podcasts episodes={episodes} />
+      <Footer />
+      <ThemeToggle />
     </OrbContextProvider>
   );
 }
