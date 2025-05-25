@@ -7,27 +7,17 @@ import Podcasts from './components/Podcasts';
 import PodcastHero from './components/PodcastHero';
 import Footer from './components/Footer';
 import ThemeToggle from './components/ThemeToggle';
-
-const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
-const SUPABASE_KEY = process.env.REACT_APP_SUPABASE_KEY;
+import supabase from './supabase';
 
 export default function PodcastPage() {
   const [episodes, setEpisodes] = useState([]);
 
   useEffect(() => {
     const fetchEpisodes = async () => {
-      if (!SUPABASE_URL || !SUPABASE_KEY) return;
       try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/podcasts?select=*`, {
-          headers: {
-            apikey: SUPABASE_KEY,
-            Authorization: `Bearer ${SUPABASE_KEY}`,
-          },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setEpisodes(data);
-        }
+        const { data, error } = await supabase.from('podcasts').select('*');
+        if (error) throw error;
+        setEpisodes(data || []);
       } catch (err) {
         console.error('Failed to fetch podcasts', err);
       }
