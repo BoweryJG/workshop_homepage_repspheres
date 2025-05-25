@@ -140,7 +140,15 @@ export default function NavBar() {
   const [openAuth, setOpenAuth] = React.useState(null); // 'login' or 'signup'
   const [navLoading, setNavLoading] = React.useState(false);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  // Breakpoints for progressive collapsing of nav links
+  const hidePodcast = useMediaQuery('(max-width:1200px)');
+  const hideSphereOS = useMediaQuery('(max-width:1100px)');
+  const hideLinguistics = useMediaQuery('(max-width:1000px)');
+  const hideWorkspace = useMediaQuery('(max-width:900px)');
+  const hideInsights = useMediaQuery('(max-width:800px)');
+  const isMobile = hideInsights; // all nav links collapsed below 800px
+  // Show hamburger menu whenever any link is hidden
+  const showMenu = hidePodcast || hideSphereOS || hideLinguistics || hideWorkspace || isMobile;
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
   // Extra small breakpoints for very narrow screens
   const isXS = useMediaQuery('(max-width:400px)');
@@ -157,6 +165,26 @@ export default function NavBar() {
   
   // Get the gradient colors from context
   const { gradientColors } = useOrbContext();
+
+  // Determine display styles for each nav link based on screen width
+  const getLinkStyles = (key) => {
+    if (key === 'podcast') {
+      return { '@media (max-width:1200px)': { display: 'none' } };
+    }
+    if (key === 'sphereos') {
+      return { '@media (max-width:1100px)': { display: 'none' } };
+    }
+    if (key === 'linguistics') {
+      return { '@media (max-width:1000px)': { display: 'none' } };
+    }
+    if (key === 'workspace') {
+      return { '@media (max-width:900px)': { display: 'none' } };
+    }
+    if (key === 'insights') {
+      return { '@media (max-width:800px)': { display: 'none' } };
+    }
+    return {};
+  };
 
   // Orb SVG for brand logo with gradient colors
   const orb = (
@@ -693,6 +721,7 @@ export default function NavBar() {
                     className={isLinkActive(link.href, currentUrl) ? 'active' : ''}
                     sx={{
                       ...navButtonStyles,
+                      ...getLinkStyles(link.key),
                       '& .buttonText': {
                         display: { xs: 'none', sm: 'inline' }
                       }
@@ -816,7 +845,7 @@ export default function NavBar() {
           </Menu>
 
           {/* Mobile Menu Button */}
-          {isMobile && (
+          {showMenu && (
             <IconButton
               edge="end"
               color="inherit"
