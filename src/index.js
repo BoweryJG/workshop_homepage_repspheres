@@ -12,8 +12,11 @@ import { initAnalytics } from './analytics';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 const path = window.location.pathname;
+const searchParams = new URLSearchParams(window.location.search);
+const page = searchParams.get('page');
+
 let PageComponent = App;
-if (path.startsWith('/podcast')) {
+if (path.startsWith('/podcast') || path === '/podcast.html' || page === 'podcast') {
   PageComponent = PodcastPage;
 } else if (path.startsWith('/login')) {
   PageComponent = LoginPage;

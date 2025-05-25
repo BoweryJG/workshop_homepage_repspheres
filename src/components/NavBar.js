@@ -81,7 +81,7 @@ const getNavLinks = (currentUrl, isAdmin) => {
     {
       key: 'podcast',
       label: 'Podcast',
-      href: '/podcast',
+      href: '/?page=podcast',
       icon: <PodcastsIcon fontSize="small" sx={{ color: ACCENT_COLOR }} />,
       description: 'Industry insights & interviews'
     },
@@ -109,7 +109,7 @@ const getNavLinks = (currentUrl, isAdmin) => {
   }
 
   // Hide podcast link when already on the podcast page
-  if (currentUrl.includes('/podcast')) {
+  if (currentUrl.includes('/podcast.html') || currentUrl.includes('page=podcast')) {
     return links.filter((l) => l.key !== 'podcast');
   }
 
@@ -129,6 +129,12 @@ const isLinkActive = (href, currentUrl) => {
   if (href.startsWith('http')) {
     return currentUrl.includes(new URL(href).hostname);
   }
+  
+  // Special case for podcast page
+  if (href === '/?page=podcast') {
+    return currentUrl.includes('page=podcast') || currentUrl.includes('/podcast.html');
+  }
+  
   return currentUrl.includes(href);
 };
 
@@ -591,421 +597,401 @@ export default function NavBar() {
 
   return (
     <>
-    {/* Loading Progress Bar */}
-    {navLoading && (
-      <Box sx={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '3px',
-        background: 'linear-gradient(90deg, #00ffc6 0%, #7B42F6 100%)',
-        zIndex: 9999,
-        animation: 'loading 1s ease-in-out infinite',
-        '@keyframes loading': {
-          '0%': { transform: 'translateX(-100%)' },
-          '100%': { transform: 'translateX(100%)' },
-        }
-      }} />
-    )}
-    
-    <AppBar position="sticky" elevation={0} sx={{
-      background: 'rgba(24,24,43,0.52)',
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
-      boxShadow: '0 6px 24px 0 rgba(123,66,246,0.15)',
-      border: '1px solid rgba(123,66,246,0.13)',
-      borderBottom: '1px solid rgba(123,66,246,0.10)',
-      borderRadius: { xs: '0 0 16px 16px', md: '0 0 24px 24px' },
-      mx: 'auto',
-      mt: { xs: 0.5, md: 1 },
-      width: { xs: 'calc(100% - 10px)', sm: 'calc(100% - 20px)', md: 'calc(100% - 40px)' },
-      maxWidth: '1800px',
-      overflow: 'hidden',
-      zIndex: 1200,
-      transition: 'all 0.3s ease',
-      '&:hover': {
-        boxShadow: '0 8px 32px 0 rgba(123,66,246,0.25)',
-      },
-    }}>
-      <Toolbar sx={{ 
-        px: { xs: 1, sm: 2 },
-        height: { xs: '60px', sm: '64px' },
-        minHeight: { xs: '60px', sm: '64px' },
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+      {/* Loading Progress Bar */}
+      {navLoading && (
+        <Box sx={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '3px',
+          background: 'linear-gradient(90deg, #00ffc6 0%, #7B42F6 100%)',
+          zIndex: 9999,
+          animation: 'loading 1s ease-in-out infinite',
+          '@keyframes loading': {
+            '0%': { transform: 'translateX(-100%)' },
+            '100%': { transform: 'translateX(100%)' },
+          }
+        }} />
+      )}
+      
+      <AppBar position="sticky" elevation={0} sx={{
+        background: 'rgba(24,24,43,0.52)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        boxShadow: '0 6px 24px 0 rgba(123,66,246,0.15)',
+        border: '1px solid rgba(123,66,246,0.13)',
+        borderBottom: '1px solid rgba(123,66,246,0.10)',
+        borderRadius: { xs: '0 0 16px 16px', md: '0 0 24px 24px' },
+        mx: 'auto',
+        mt: { xs: 0.5, md: 1 },
+        width: { xs: 'calc(100% - 10px)', sm: 'calc(100% - 20px)', md: 'calc(100% - 40px)' },
+        maxWidth: '1800px',
+        overflow: 'hidden',
+        zIndex: 1200,
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          boxShadow: '0 8px 32px 0 rgba(123,66,246,0.25)',
+        },
       }}>
-        {/* Logo Section */}
-        <Box 
-          component="a" 
-          href="https://repspheres.com" 
-          onClick={(e) => {
-            e.preventDefault();
-            handleNavigation('https://repspheres.com');
-          }}
-          sx={{ 
-            display: 'flex', 
-            alignItems: 'center',
-            textDecoration: 'none',
-            color: 'inherit',
-            transition: 'transform 0.3s ease',
-            '&:hover': {
-              transform: 'scale(1.05)',
-            }
-          }}
-        >
-          <Box sx={{ 
-            display: 'flex',
-            alignItems: 'center',
-            mr: 1,
-            width: { xs: 28, sm: 32 },
-            height: { xs: 28, sm: 32 }
-          }}>
-            {orb}
+        <Toolbar sx={{ 
+          px: { xs: 1, sm: 2 },
+          height: { xs: '60px', sm: '64px' },
+          minHeight: { xs: '60px', sm: '64px' },
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+          {/* Logo Section */}
+          <Box 
+            component="a" 
+            href="https://repspheres.com" 
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavigation('https://repspheres.com');
+            }}
+            sx={{ 
+              display: 'flex', 
+              alignItems: 'center',
+              textDecoration: 'none',
+              color: 'inherit',
+              transition: 'transform 0.3s ease',
+              '&:hover': {
+                transform: 'scale(1.05)',
+              }
+            }}
+          >
+            <Box sx={{ 
+              display: 'flex',
+              alignItems: 'center',
+              mr: 1,
+              width: { xs: 28, sm: 32 },
+              height: { xs: 28, sm: 32 }
+            }}>
+              {orb}
+            </Box>
+            
+            <Box sx={{ 
+              display: 'flex',
+              fontSize: { xs: '1.1rem', sm: '1.2rem' },
+              fontWeight: 800,
+              letterSpacing: '0.03em',
+            }}>
+              <Box component="span">Rep</Box>
+              <Box component="span" sx={{
+                background: 'linear-gradient(90deg, #00ffc6 0%, #7B42F6 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}>Spheres</Box>
+            </Box>
           </Box>
-          
-          <Box sx={{ 
-            display: 'flex',
-            fontSize: { xs: '1.1rem', sm: '1.2rem' },
-            fontWeight: 800,
-            letterSpacing: '0.03em',
-          }}>
-            <Box component="span">Rep</Box>
-            <Box component="span" sx={{
-              background: 'linear-gradient(90deg, #00ffc6 0%, #7B42F6 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}>Spheres</Box>
-          </Box>
-        </Box>
 
-        {/* Middle Section - Navigation (only on desktop) */}
-        {!isMobile && (
-          <Box sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            mx: 'auto',
-            position: 'absolute',
-            left: '50%',
-            transform: 'translateX(-50%)',
-          }}>
+          {/* Middle Section - Navigation (only on desktop) */}
+          {!isMobile && (
             <Box sx={{
               display: 'flex',
               alignItems: 'center',
-              height: '100%',
-              px: { sm: 1, md: 2 },
-              maxWidth: { sm: '65vw', md: '70vw' },
-              overflowX: 'auto',
-              '&::-webkit-scrollbar': { display: 'none' },
-              msOverflowStyle: 'none',
-              scrollbarWidth: 'none',
+              justifyContent: 'center',
+              mx: 'auto',
+              position: 'absolute',
+              left: '50%',
+              transform: 'translateX(-50%)',
             }}>
-              {navLinks.map((link) => (
-                <Tooltip 
-                  key={link.key}
-                  title={link.description}
-                  arrow
-                  placement="bottom"
-                  TransitionComponent={Fade}
-                  TransitionProps={{ timeout: 300 }}
-                >
-                  <Button
-                    component="a"
-                    href={link.href}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleNavigation(link.href);
-                    }}
-                    className={isLinkActive(link.href, currentUrl) ? 'active' : ''}
-                    sx={{
-                      ...navButtonStyles,
-                      ...getLinkStyles(link.key),
-                      '& .buttonText': {
-                        display: { xs: 'none', sm: 'inline' }
-                      }
-                    }}
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                height: '100%',
+                px: { sm: 1, md: 2 },
+                maxWidth: { sm: '65vw', md: '70vw' },
+                overflowX: 'auto',
+                '&::-webkit-scrollbar': { display: 'none' },
+                msOverflowStyle: 'none',
+                scrollbarWidth: 'none',
+              }}>
+                {navLinks.map((link) => (
+                  <Tooltip 
+                    key={link.key}
+                    title={link.description}
+                    arrow
+                    placement="bottom"
+                    TransitionComponent={Fade}
+                    TransitionProps={{ timeout: 300 }}
                   >
-                    <Box sx={{ 
-                      mr: { xs: 0, sm: 1 },
-                      display: 'flex',
-                      alignItems: 'center'
-                    }}>
-                      {link.icon}
-                    </Box>
-                    <Box component="span" className="buttonText">{link.label}</Box>
-                  </Button>
-                </Tooltip>
-              ))}
+                    <Button
+                      component="a"
+                      href={link.href}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleNavigation(link.href);
+                      }}
+                      className={isLinkActive(link.href, currentUrl) ? 'active' : ''}
+                      sx={{
+                        ...navButtonStyles,
+                        ...getLinkStyles(link.key),
+                        '& .buttonText': {
+                          display: { xs: 'none', sm: 'inline' }
+                        }
+                      }}
+                    >
+                      <Box sx={{ 
+                        mr: { xs: 0, sm: 1 },
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}>
+                        {link.icon}
+                      </Box>
+                      <Box component="span" className="buttonText">{link.label}</Box>
+                    </Button>
+                  </Tooltip>
+                ))}
+              </Box>
             </Box>
-          </Box>
-        )}
+          )}
 
-        {/* Right Section - Auth Buttons & Menu Button */}
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          ml: 'auto',
-          gap: { xs: 0.5, sm: 1 },
-        }}>
-          
-          {/* Auth Button or User Profile */}
+          {/* Right Section - Auth Buttons & Menu Button */}
           <Box sx={{
             display: 'flex',
             alignItems: 'center',
+            ml: 'auto',
+            gap: { xs: 0.5, sm: 1 },
           }}>
-            {loading ? (
-              <CircularProgress size={24} color="inherit" sx={{ opacity: 0.7 }} />
-            ) : user ? (
-              <Tooltip title="Account menu" arrow>
+            
+            {/* Auth Button or User Profile */}
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+            }}>
+              {loading ? (
+                <CircularProgress size={24} color="inherit" sx={{ opacity: 0.7 }} />
+              ) : user ? (
+                <Tooltip title="Account menu" arrow>
+                  <IconButton
+                    onClick={handleAuthMenuOpen}
+                    size="small"
+                    sx={{
+                      ml: 0.5,
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      p: 0.5,
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        borderColor: ACCENT_COLOR,
+                        transform: 'scale(1.1)',
+                        boxShadow: `0 0 15px ${ACCENT_COLOR}40`,
+                      }
+                    }}
+                  >
+                    {user.user_metadata?.avatar_url ? (
+                      <Avatar
+                        src={user.user_metadata.avatar_url}
+                        sx={{ width: 32, height: 32 }}
+                      />
+                    ) : (
+                      <PersonIcon sx={{ color: '#fff' }} />
+                    )}
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                <>
+                  <Button
+                    onClick={() => handleAuthOpen('login')}
+                    variant="outlined"
+                    sx={loginStyles}
+                  >
+                    Log In
+                  </Button>
+                  <Button
+                    onClick={() => handleAuthOpen('signup')}
+                    variant="contained"
+                    sx={signupStyles}
+                  >
+                    Sign Up
+                  </Button>
+                </>
+              )}
+            </Box>
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
+            {/* More Menu Button (Desktop) */}
+            {!isMobile && (
+              <Tooltip title="More options" arrow>
                 <IconButton
-                  onClick={handleAuthMenuOpen}
-                  size="small"
-                  sx={{
-                    ml: 0.5,
-                    border: '1px solid rgba(255,255,255,0.2)',
-                    p: 0.5,
+                  onClick={handleMenuOpen}
+                  sx={{ 
+                    color: '#fff',
                     transition: 'all 0.3s ease',
                     '&:hover': {
-                      borderColor: ACCENT_COLOR,
-                      transform: 'scale(1.1)',
-                      boxShadow: `0 0 15px ${ACCENT_COLOR}40`,
+                      color: ACCENT_COLOR,
+                      transform: 'rotate(90deg) scale(1.1)',
                     }
                   }}
                 >
-                  {user.user_metadata?.avatar_url ? (
-                    <Avatar
-                      src={user.user_metadata.avatar_url}
-                      sx={{ width: 32, height: 32 }}
-                    />
-                  ) : (
-                    <PersonIcon sx={{ color: '#fff' }} />
-                  )}
+                  <MoreVertIcon />
                 </IconButton>
               </Tooltip>
-            ) : (
-              <>
-                <Button
-                  onClick={() => handleAuthOpen('login')}
-                  variant="outlined"
-                  sx={loginStyles}
-                >
-                  Log In
-                </Button>
-                <Button
-                  onClick={() => handleAuthOpen('signup')}
-                  variant="contained"
-                  sx={signupStyles}
-                >
-                  Sign Up
-                </Button>
-              </>
             )}
-          </Box>
-          
-          {/* User Menu */}
-          <Menu
-            id="auth-menu"
-            anchorEl={authMenuAnchorEl}
-            open={Boolean(authMenuAnchorEl)}
-            onClose={handleAuthMenuClose}
-            TransitionComponent={Fade}
-            PaperProps={{
-              sx: {
-                mt: 1.5,
-                background: 'rgba(20,14,38,0.98)',
-                backdropFilter: 'blur(20px)',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-                borderRadius: 2,
-                border: '1px solid rgba(123,66,246,0.15)',
-                minWidth: 220,
-              }
-            }}
-          >
-            <Box sx={{ px: 2, py: 1.5 }}>
-              <Typography variant="subtitle2" sx={{ color: '#fff', opacity: 0.7 }}>
-                Signed in as
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#fff', fontWeight: 500 }}>
-                {user?.email}
-              </Typography>
-            </Box>
-            <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
-            <MenuItem onClick={handleSignOut} sx={{ 
-              color: '#fff',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                background: 'rgba(255,0,0,0.1)',
-              }
-            }}>
-              <LogoutIcon fontSize="small" sx={{ mr: 1 }} />
-              Sign Out
-            </MenuItem>
-          </Menu>
 
-          {/* Mobile Menu Button */}
-          {showMenu && (
-            <IconButton
-              edge="end"
-              color="inherit"
-              aria-label="menu"
-              onClick={toggleDrawer(true)}
-              sx={{
-                ml: 1,
-                transform: isXS ? 'scale(0.8)' : 'none',
-                display: isXXS ? 'none' : 'inline-flex',
-              }}
-            >
-              <MenuIcon />
-            </IconButton>
-          )}
-
-          {/* More Menu - Only on desktop */}
-          {!isMobile && (
-            <IconButton
-              aria-label="more options"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleMenuOpen}
-              sx={{ 
-                ml: 0.5, 
-                color: '#fff',
-                display: { xs: 'none', md: 'flex' }
-              }}
-            >
-              <MoreVertIcon />
-            </IconButton>
-          )}
-
-          {/* More Menu Dropdown */}
-          <Menu
-            id="menu-appbar"
-            anchorEl={menuAnchorEl}
-            keepMounted
-            open={Boolean(menuAnchorEl)}
-            onClose={handleMenuClose}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            TransitionComponent={Fade}
-            PaperProps={{
-              sx: {
-                mt: 1.5,
-                background: 'rgba(20,14,38,0.98)',
-                backdropFilter: 'blur(20px)',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-                borderRadius: 2,
-                border: '1px solid rgba(123,66,246,0.15)',
-                minWidth: 180,
-              }
-            }}
-          >
-            <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', my: 1 }} />
-
-            {/* More Menu Items */}
-            {moreMenuItems.map((item, index) => (
-              <MenuItem
-                key={index}
-                onClick={() => handleInfoOpen(item.key)}
+            {/* Hamburger Menu Button (Mobile) */}
+            {showMenu && (
+              <IconButton
+                edge="end"
+                color="inherit"
+                aria-label="menu"
+                onClick={toggleDrawer(true)}
                 sx={{ 
-                  color: '#fff',
+                  display: { xs: 'flex' },
                   transition: 'all 0.3s ease',
                   '&:hover': {
-                    background: 'rgba(123, 66, 246, 0.1)',
+                    color: ACCENT_COLOR,
+                    transform: 'scale(1.1)',
                   }
                 }}
               >
-                {item.label}
-              </MenuItem>
-            ))}
-          </Menu>
-        </Box>
+                <MenuIcon />
+              </IconButton>
+            )}
+          </Box>
+        </Toolbar>
+      </AppBar>
 
-        {/* Mobile Drawer */}
-        <Drawer
-          anchor="right"
-          open={drawerOpen}
-          onClose={toggleDrawer(false)}
-          PaperProps={{
-            sx: {
-              background: 'transparent',
-              boxShadow: 'none',
-            }
+      {/* Drawer for Mobile Navigation */}
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={toggleDrawer(false)}
+        PaperProps={{
+          sx: {
+            background: 'transparent',
+            boxShadow: 'none',
+          }
+        }}
+      >
+        {drawerContent}
+      </Drawer>
+
+      {/* More Menu (Desktop) */}
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        PaperProps={{
+          sx: {
+            mt: 1,
+            borderRadius: '12px',
+            background: 'rgba(30,20,55,0.95)',
+            backdropFilter: 'blur(15px)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+            border: '1px solid rgba(123,66,246,0.2)',
+            color: '#fff',
+            minWidth: '200px',
+          }
+        }}
+      >
+        {moreMenuItems.map((item) => (
+          <MenuItem 
+            key={item.key} 
+            onClick={() => handleInfoOpen(item.key)}
+            sx={{
+              py: 1.2,
+              px: 2,
+              fontSize: '0.95rem',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                background: 'rgba(123,66,246,0.2)',
+                color: ACCENT_COLOR,
+              }
+            }}
+          >
+            {item.label}
+          </MenuItem>
+        ))}
+      </Menu>
+      
+      {/* Auth Menu */}
+      <Menu
+        anchorEl={authMenuAnchorEl}
+        open={Boolean(authMenuAnchorEl)}
+        onClose={handleAuthMenuClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        PaperProps={{
+          sx: {
+            mt: 1,
+            borderRadius: '12px',
+            background: 'rgba(30,20,55,0.95)',
+            backdropFilter: 'blur(15px)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+            border: '1px solid rgba(123,66,246,0.2)',
+            color: '#fff',
+            minWidth: '220px',
+            p: 1,
+          }
+        }}
+      >
+        {user && (
+          <Box sx={{ p: 1, mb: 1, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+              {user.user_metadata?.full_name || 'User'}
+            </Typography>
+            <Typography variant="caption" sx={{ opacity: 0.7 }}>
+              {user.email}
+            </Typography>
+          </Box>
+        )}
+        <MenuItem 
+          onClick={handleSignOut}
+          sx={{
+            py: 1.2,
+            px: 2,
+            fontSize: '0.95rem',
+            color: '#ff7979',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              background: 'rgba(255,121,121,0.15)',
+            },
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
           }}
         >
-          {drawerContent}
-        </Drawer>
-      </Toolbar>
-    </AppBar>
+          <LogoutIcon fontSize="small" />
+          Sign Out
+        </MenuItem>
+      </Menu>
 
-    {/* Auth Modals */}
-    <AuthModal
-      open={openAuth === 'login'}
-      onClose={handleAuthClose}
-      mode="login"
-    />
-    <AuthModal
-      open={openAuth === 'signup'}
-      onClose={handleAuthClose}
-      mode="signup"
-    />
+      {/* Info Modals */}
+      {moreMenuItems.map(item => (
+        <InfoModal 
+          key={item.key}
+          open={openInfo === item.key} 
+          onClose={handleInfoClose} 
+          title={item.label}
+        >
+          <Typography>Content for {item.label} goes here.</Typography>
+        </InfoModal>
+      ))}
 
-    {/* Information Modals */}
-    <InfoModal
-      open={openInfo === 'about'}
-      onClose={handleInfoClose}
-      title="About RepSpheres"
-      maxWidth="xs"
-    >
-      <Typography variant="body1" sx={{ mb: 1 }}>
-        RepSpheres empowers elite sales teams with unified workflows and
-        actionable market intelligence.
-      </Typography>
-    </InfoModal>
-
-    <InfoModal
-      open={openInfo === 'contact'}
-      onClose={handleInfoClose}
-      title="Contact"
-      maxWidth="xs"
-    >
-      <Typography variant="body1" sx={{ mb: 1 }}>
-        Reach us at <a href="mailto:contact@repspheres.com" style={{ color: ACCENT_COLOR }}>contact@repspheres.com</a>
-        {' '}to learn more or schedule a call.
-      </Typography>
-    </InfoModal>
-
-    <InfoModal
-      open={openInfo === 'careers'}
-      onClose={handleInfoClose}
-      title="Careers"
-      maxWidth="xs"
-    >
-      <Typography variant="body1" sx={{ mb: 1 }}>
-        We're always looking for talent passionate about sales technology.
-        Send your resume to{' '}
-        <a href="mailto:careers@repspheres.com" style={{ color: ACCENT_COLOR }}>careers@repspheres.com</a>.
-      </Typography>
-    </InfoModal>
-
-    <InfoModal
-      open={openInfo === 'legal'}
-      onClose={handleInfoClose}
-      title="Legal"
-      maxWidth="xs"
-    >
-      <Typography variant="body1">
-        Use of RepSpheres is subject to our{' '}
-        <a href="/terms.html" style={{ color: ACCENT_COLOR }}>Terms of Service</a> and{' '}
-        <a href="/privacy.html" style={{ color: ACCENT_COLOR }}>Privacy Policy</a>.
-      </Typography>
-    </InfoModal>
+      {/* Auth Modal */}
+      <AuthModal 
+        open={openAuth !== null} 
+        onClose={handleAuthClose} 
+        initialMode={openAuth || 'login'}
+      />
     </>
   );
 }
