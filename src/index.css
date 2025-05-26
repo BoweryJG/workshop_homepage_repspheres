@@ -184,6 +184,21 @@ p {
   50% { opacity: 0.8; transform: scale(1.2); }
 }
 
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* Hero section */
 .hero {
   min-height: 100vh;

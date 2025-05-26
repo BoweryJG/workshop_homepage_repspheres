@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Container } from '@mui/material';
+import { Box, Typography, Container, Tabs, Tab, Paper } from '@mui/material';
 import NavBar from './components/NavBar';
 import StarryBackground from './components/StarryBackground';
 import OrbContextProvider from './components/OrbContextProvider';
 import Podcasts from './components/Podcasts';
 import PodcastHero from './components/PodcastHero';
+import LiveFeed from './components/LiveFeed';
 import Footer from './components/Footer';
 import ThemeToggle from './components/ThemeToggle';
 import { AuthProvider } from './contexts/AuthContext';
 import supabase from './supabase';
+import PodcastsIcon from '@mui/icons-material/Podcasts';
+import LiveTvIcon from '@mui/icons-material/LiveTv';
 
 const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
 const SUPABASE_KEY = process.env.REACT_APP_SUPABASE_KEY;
@@ -34,6 +37,11 @@ const generateDescription = (title) => {
 
 export default function PodcastPage() {
   const [episodes, setEpisodes] = useState([]);
+  const [activeTab, setActiveTab] = useState(0);
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
 
   useEffect(() => {
     const fetchEpisodes = async () => {
@@ -108,9 +116,78 @@ export default function PodcastPage() {
         <StarryBackground />
         <NavBar />
         <PodcastHero />
-        <Box id="episodes">
-          <Podcasts episodes={episodes} />
+        
+        {/* Tabs Section */}
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+          <Paper 
+            elevation={0}
+            sx={{ 
+              bgcolor: 'rgba(40, 20, 70, 0.7)',
+              borderRadius: 3,
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              overflow: 'hidden'
+            }}
+          >
+            <Tabs 
+              value={activeTab} 
+              onChange={handleTabChange}
+              variant="fullWidth"
+              sx={{
+                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                '& .MuiTab-root': {
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  fontWeight: 600,
+                  fontSize: '1.1rem',
+                  py: 2,
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    color: 'var(--secondary, #00ffc6)',
+                    bgcolor: 'rgba(0, 255, 198, 0.05)'
+                  }
+                },
+                '& .Mui-selected': {
+                  color: 'var(--secondary, #00ffc6) !important',
+                  position: 'relative',
+                  '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: 3,
+                    bgcolor: 'var(--secondary, #00ffc6)',
+                    borderRadius: '3px 3px 0 0'
+                  }
+                },
+                '& .MuiTabs-indicator': {
+                  display: 'none'
+                }
+              }}
+            >
+              <Tab 
+                icon={<PodcastsIcon sx={{ mb: 0.5 }} />} 
+                label="Episodes" 
+                iconPosition="start"
+              />
+              <Tab 
+                icon={<LiveTvIcon sx={{ mb: 0.5 }} />} 
+                label="Live & Trending" 
+                iconPosition="start"
+              />
+            </Tabs>
+          </Paper>
+        </Container>
+        
+        {/* Content based on active tab */}
+        <Box id="episodes" sx={{ minHeight: '60vh' }}>
+          {activeTab === 0 && <Podcasts episodes={episodes} />}
+          {activeTab === 1 && (
+            <Container maxWidth="lg">
+              <LiveFeed />
+            </Container>
+          )}
         </Box>
+        
         <Footer />
         <ThemeToggle />
       </AuthProvider>
