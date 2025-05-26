@@ -22,7 +22,6 @@ import GoogleIcon from '@mui/icons-material/Google';
 import PersonIcon from '@mui/icons-material/Person';
 import { useOrbContext } from './OrbContextProvider';
 import { useAuth } from '../contexts/AuthContext';
-import ThemeToggle from './ThemeToggle';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -810,8 +809,6 @@ export default function NavBar() {
               )}
             </Box>
 
-            {/* Theme Toggle */}
-            <ThemeToggle />
 
             {/* More Menu Button (Desktop) */}
             {!isMobile && (
