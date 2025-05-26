@@ -132,7 +132,7 @@ export default function ModulesSection() {
               textShadow: '0 4px 20px rgba(0,255,198,0.2)',
             }}
           >
-            Four Spheres of Sales Dominance
+            Built for How You Actually Sell
           </Typography>
           <Typography
             variant="h6"
@@ -145,7 +145,7 @@ export default function ModulesSection() {
               lineHeight: 1.6,
             }}
           >
-            Each module is a force multiplier. Together, they create an unstoppable sales intelligence ecosystem.
+            Modular intelligence that scales with your role. From territory managers to enterprise teams, RepSpheres adapts to your workflow.
           </Typography>
         </Box>
 
@@ -402,6 +402,129 @@ export default function ModulesSection() {
             Conversation analysis enhances your CRM data. Together, they create a 
             sales intelligence system that's greater than the sum of its parts.
           </Typography>
+        </Box>
+
+        {/* Tiers Section */}
+        <Box sx={{ mt: 12 }}>
+          <Typography
+            variant="h3"
+            sx={{
+              fontFamily: "'Space Grotesk', Arial, sans-serif",
+              fontWeight: 700,
+              fontSize: { xs: '2rem', md: '2.8rem' },
+              mb: 6,
+              textAlign: 'center',
+              color: '#fff',
+            }}
+          >
+            Intelligence That Scales With Your Role
+          </Typography>
+          
+          <Grid container spacing={3}>
+            {[
+              {
+                title: 'Territory Managers',
+                description: 'Ground-level intelligence for daily wins',
+                features: ['Real-time territory insights', 'AI-powered research', 'Conversation analytics'],
+                color: '#00ffc6',
+              },
+              {
+                title: 'Area Sales Managers',
+                description: 'Regional insights that drive team performance',
+                features: ['Team performance metrics', 'Territory optimization', 'Competitive intelligence'],
+                color: '#3a86ff',
+              },
+              {
+                title: 'Regional Sales Managers',
+                description: 'Strategic oversight with predictive analytics',
+                features: ['Market trend analysis', 'Predictive modeling', 'Multi-territory coordination'],
+                color: '#7B42F6',
+              },
+              {
+                title: 'Enterprise',
+                description: 'Custom solutions for market domination',
+                features: ['Custom integrations', 'Dedicated support', 'White-label options'],
+                color: '#ff006e',
+              },
+            ].map((tier, index) => (
+              <Grid item xs={12} sm={6} md={3} key={index}>
+                <Box
+                  sx={{
+                    p: 3,
+                    height: '100%',
+                    borderRadius: '16px',
+                    background: 'rgba(40, 20, 70, 0.3)',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    border: '1px solid',
+                    borderColor: `${tier.color}33`,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-5px)',
+                      borderColor: `${tier.color}66`,
+                      boxShadow: `0 10px 30px ${tier.color}22`,
+                    },
+                  }}
+                >
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontFamily: "'Space Grotesk', Arial, sans-serif",
+                      fontWeight: 700,
+                      fontSize: '1.3rem',
+                      color: tier.color,
+                      mb: 1,
+                    }}
+                  >
+                    {tier.title}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: "'DM Sans', Arial, sans-serif",
+                      fontSize: '0.95rem',
+                      color: 'rgba(255,255,255,0.8)',
+                      mb: 2,
+                      minHeight: 48,
+                    }}
+                  >
+                    {tier.description}
+                  </Typography>
+                  <Box>
+                    {tier.features.map((feature, idx) => (
+                      <Box
+                        key={idx}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          mb: 1,
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            width: 4,
+                            height: 4,
+                            borderRadius: '50%',
+                            backgroundColor: tier.color,
+                            mr: 1.5,
+                            opacity: 0.7,
+                          }}
+                        />
+                        <Typography
+                          sx={{
+                            fontFamily: "'DM Sans', Arial, sans-serif",
+                            fontSize: '0.85rem',
+                            color: 'rgba(255,255,255,0.7)',
+                          }}
+                        >
+                          {feature}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
         </Box>
       </Container>
     </Box>

@@ -22,6 +22,56 @@ export default function Footer() {
       zIndex: 2,
     }}>
       <Container maxWidth="md">
+        {/* Tagline */}
+        <Typography
+          sx={{
+            fontFamily: "'Space Grotesk', Arial, sans-serif",
+            fontSize: '1.5rem',
+            fontWeight: 700,
+            textAlign: 'center',
+            mb: 4,
+            background: 'linear-gradient(90deg, #00ffc6 0%, #7B42F6 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}
+        >
+          RepSpheres: Where Intelligence Meets Influence
+        </Typography>
+
+        {/* Trust Signals */}
+        <Box sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          gap: 4,
+          mb: 4,
+        }}>
+          {[
+            'HIPAA Compliant',
+            'Exclusive Territorial Licensing',
+            'Built by Industry Veterans, for Industry Leaders'
+          ].map((signal, index) => (
+            <Typography
+              key={index}
+              sx={{
+                color: 'rgba(255,255,255,0.7)',
+                fontSize: '0.9rem',
+                fontWeight: 500,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                '&:before': {
+                  content: '"✓"',
+                  color: '#00ffc6',
+                  fontWeight: 700,
+                }
+              }}
+            >
+              {signal}
+            </Typography>
+          ))}
+        </Box>
         <Box sx={{
           display: 'flex',
           flexWrap: 'wrap',

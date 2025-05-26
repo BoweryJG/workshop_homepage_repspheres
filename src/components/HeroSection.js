@@ -66,13 +66,12 @@ export default function HeroSection() {
     sx={{
       fontFamily: "'Space Grotesk', 'Montserrat Alternates', Arial, sans-serif",
       fontWeight: 900,
-      fontSize: { xs: '3.2rem', md: '5.5rem', lg: '6.5rem' },
+      fontSize: { xs: '2.8rem', md: '4.5rem', lg: '5.5rem' },
       mb: 3,
-      letterSpacing: '-0.04em',
-      lineHeight: 0.95,
+      letterSpacing: '-0.03em',
+      lineHeight: 1.1,
       position: 'relative',
       zIndex: 2,
-      textTransform: 'uppercase',
     }}
   >
     <Box
@@ -104,14 +103,13 @@ export default function HeroSection() {
         }
       }}
     >
-      Turn Data
+      The Intelligence Revolution
     </Box>
     <Box
       component="span"
       sx={{
         display: 'block',
-        mt: -1,
-        ml: { xs: 0, md: 4 },
+        mt: 1,
         position: 'relative',
       }}
     >
@@ -134,22 +132,21 @@ export default function HeroSection() {
           }
         }}
       >
-        Into Deals.
+        Has Arrived.
       </Box>
     </Box>
     <Box
       component="span"
       sx={{
         display: 'block',
-        fontSize: { xs: '0.85em', md: '0.9em' },
+        fontSize: { xs: '0.75em', md: '0.8em' },
         mt: 2,
-        ml: { xs: 0, md: 8 },
         background: 'linear-gradient(270deg, #7B42F6 0%, #ff006e 50%, #00ffc6 100%)',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         backgroundClip: 'text',
         fontWeight: 800,
-        letterSpacing: '0.05em',
+        letterSpacing: '0.02em',
         animation: 'pulse 2s ease-in-out infinite',
         '@keyframes pulse': {
           '0%, 100%': { opacity: 0.8, transform: 'scale(1)' },
@@ -157,18 +154,37 @@ export default function HeroSection() {
         }
       }}
     >
-      Instantly.
+      Which Side Are You On?
     </Box>
   </Typography>
+  <Typography
+    variant="h5"
+    sx={{
+      fontFamily: "'DM Sans', Arial, sans-serif",
+      mb: 3,
+      maxWidth: 800,
+      mx: 'auto',
+      fontWeight: 500,
+      fontSize: { xs: '1.1rem', md: '1.3rem', lg: '1.5rem' },
+      letterSpacing: '0.01em',
+      position: 'relative',
+      zIndex: 2,
+      lineHeight: 1.5,
+      color: 'rgba(255,255,255,0.9)',
+    }}
+  >
+    Sales reps and physicians have embraced high-end technology for years. Now it's time to bring that same sophistication to your business intelligence.
+  </Typography>
+  
   <Typography
     variant="h6"
     sx={{
       fontFamily: "'Space Grotesk', Arial, sans-serif",
-      mb: 6,
-      maxWidth: 600,
+      mb: 5,
+      maxWidth: 700,
       mx: 'auto',
       fontWeight: 600,
-      fontSize: { xs: '1.25rem', md: '1.5rem', lg: '1.75rem' },
+      fontSize: { xs: '1.15rem', md: '1.35rem', lg: '1.5rem' },
       letterSpacing: '0.02em',
       position: 'relative',
       zIndex: 2,
@@ -205,7 +221,7 @@ export default function HeroSection() {
         }
       }}
     >
-      15 years of insights
+      15 years of pivotal data
     </Box>
     <Box component="span" sx={{ color: 'rgba(255,255,255,0.7)', mx: 1 }}>•</Box>
     <Box
@@ -224,7 +240,7 @@ export default function HeroSection() {
         }
       }}
     >
-      One revolutionary platform
+      One system that thinks
     </Box>
   </Typography>
   <Box sx={{ display: 'flex', gap: 3, justifyContent: 'center', flexWrap: 'wrap', mt: 4 }}>
@@ -275,7 +291,7 @@ export default function HeroSection() {
       }}
     >
       <Box component="span" sx={{ position: 'relative', zIndex: 1 }}>
-        Start Free Trial
+        Claim Your Competitive Edge
       </Box>
       <Box
         component="span"
@@ -350,19 +366,7 @@ export default function HeroSection() {
           gap: 1,
         }}
       >
-        <Box
-          component="span"
-          sx={{
-            animation: 'playPulse 2s ease-in-out infinite',
-            '@keyframes playPulse': {
-              '0%, 100%': { transform: 'scale(1)' },
-              '50%': { transform: 'scale(1.1)' }
-            }
-          }}
-        >
-          ▶
-        </Box>
-        Watch Demo
+        Calculate Your ROI
       </Box>
     </Button>
   </Box>

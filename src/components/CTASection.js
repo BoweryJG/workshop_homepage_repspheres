@@ -149,7 +149,7 @@ export default function CTASection() {
                 lineHeight: 1.1,
               }}
             >
-              Your Competition is Already Using AI
+              Your Next Chapter Starts With One Decision
             </Typography>
             
             <Typography
@@ -164,8 +164,8 @@ export default function CTASection() {
                 lineHeight: 1.5,
               }}
             >
-              Every day without RepSpheres is revenue left on the table. Join 500+ top performers 
-              who are closing 3x more deals with our AI-powered intelligence platform.
+              You've spent years perfecting your craft. You've embraced technology that others feared. 
+              Now it's time to apply that same forward-thinking approach to your business intelligence.
             </Typography>
 
             {/* Value Props */}
@@ -335,7 +335,7 @@ export default function CTASection() {
                   },
                 }}
               >
-                Start Your Free Trial Now
+                Schedule Strategic Consultation
               </Button>
               
               <Button
@@ -362,7 +362,7 @@ export default function CTASection() {
                   },
                 }}
               >
-                Watch 3-Min Demo
+                See RepSpheres in Action
               </Button>
             </Box>
 
