@@ -24,9 +24,9 @@ const getTrigTables = (points) => {
 
 const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) => {
   const svgRef = useRef(null);
+  const canvasRef = useRef(null);
   const parentOrbRef = useRef(null);
   const childrenGroupRef = useRef(null);
-  const particlesGroupRef = useRef(null);
 
   // Refs to store mutable values that don't trigger re-renders
   const orbStatesRef = useRef([]);
@@ -37,25 +37,24 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
   const parentCenterRef = useRef({ x: 400, y: 400 });
   const orbScaleRef = useRef(1);
   const lastWheelTimeRef = useRef(0);
-  // track time of last frame for throttling
-  const lastFrameTimeRef = useRef(0);
   const animationFrameIdRef = useRef(null);
   
   // New refs for enhanced features
   const scrollPositionRef = useRef(0);
-  // const titleLetterBoundsRef = useRef([]); // Removed
-  // const letterParticlesRef = useRef([]); // Removed
-  // const explodedLettersRef = useRef(new Set()); // Removed
+  const scrollVelocityRef = useRef(0);
+  const lastScrollTimeRef = useRef(0);
   const orbReturnAnimationsRef = useRef([]);
   const mousePositionRef = useRef({ x: 0, y: 0 });
   const isHeroVisibleRef = useRef(true);
-  const dataTransmissionsRef = useRef([]);
+  const childPositionsRef = useRef([]);
+  const parentVelocityRef = useRef({ x: 0, y: 0 });
 
   const childCount = 5;
-  const parentRadius = 64; // Reduced by 20% from 80
-  const childRadius = 23; // Reduced by 20% from 29
-  const childPoints = 36; // slightly lower complexity
-  const childAmp = 0.5;
+  const parentRadius = 30; // Reduced by 20% more (37 * 0.8)
+  const childRadius = 11; // Reduced by 20% more (14 * 0.8)
+  const parentPoints = 128; // High detail for smooth animation
+  const childPoints = 64; // High detail for smooth animation
+  const childAmp = 0.3; // Reduced amplitude for smoother shapes
   const orbMorphDirections = [];
   const orbMorphSpeeds = [];
 
@@ -97,7 +96,7 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
     const pts = [];
     for (let i = 0; i < points; i++) {
       const angle = angles[i];
-      // Reduced amplitude for more sphere-like shape
+      // Full complexity noise for ethereal effect
       const noise =
         Math.sin(angle * 3 + t * 0.7 + phase) * 1.5 * amp +
         Math.sin(angle * 5 - t * 1.1 + phase) * 0.8 * amp +
@@ -170,115 +169,17 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
     }
   };
 
-  // Generate lightning bolt path between two points
-  const generateLightningPath = (x1, y1, x2, y2, segments = 5) => {
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    
-    let path = `M${x1.toFixed(2)},${y1.toFixed(2)}`;
-    
-    for (let i = 1; i < segments; i++) {
-      const t = i / segments;
-      const x = x1 + dx * t;
-      const y = y1 + dy * t;
-      
-      // Add perpendicular offset for lightning effect
-      const perpX = -dy / distance;
-      const perpY = dx / distance;
-      const offset = (Math.random() - 0.5) * 15 * Math.sin(t * Math.PI);
-      
-      const px = x + perpX * offset;
-      const py = y + perpY * offset;
-      
-      path += ` L${px.toFixed(2)},${py.toFixed(2)}`;
-    }
-    
-    path += ` L${x2.toFixed(2)},${y2.toFixed(2)}`;
-    return path;
-  };
 
-  // Create data transmission effect
-  const createDataTransmission = (childIndex, parentX, parentY, childX, childY, color) => {
-    if (!dataTransmissionsRef.current) dataTransmissionsRef.current = [];
+  // Canvas-based particle rendering for performance
+  const renderCanvas = (ctx, now) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
     
-    dataTransmissionsRef.current.push({
-      childIndex,
-      startX: childX,
-      startY: childY,
-      endX: parentX,
-      endY: parentY,
-      progress: 0,
-      life: 1,
-      color,
-      direction: Math.random() > 0.5 ? 1 : -1, // 1 for child to parent, -1 for parent to child
-    });
-  };
-
-  const animateDataTransmissions = () => {
-    const transmissionsGroup = svgRef.current?.querySelector('#dataTransmissions');
-    if (!transmissionsGroup) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Clear previous transmissions
-    transmissionsGroup.innerHTML = '';
-    
-    // Update and draw active transmissions
-    dataTransmissionsRef.current = dataTransmissionsRef.current.filter(t => t.life > 0);
-    
-    for (const transmission of dataTransmissionsRef.current) {
-      transmission.progress += 0.03;
-      transmission.life = 1 - transmission.progress;
-      
-      if (transmission.life > 0) {
-        const t = transmission.direction === 1 ? transmission.progress : 1 - transmission.progress;
-        
-        // Create lightning path
-        const path = generateLightningPath(
-          transmission.startX,
-          transmission.startY,
-          transmission.endX,
-          transmission.endY,
-          4 + Math.floor(Math.random() * 3)
-        );
-        
-        const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        pathEl.setAttribute("d", path);
-        pathEl.setAttribute("fill", "none");
-        pathEl.setAttribute("stroke", transmission.color);
-        pathEl.setAttribute("stroke-width", (1.5 * transmission.life).toFixed(2));
-        pathEl.setAttribute("opacity", (transmission.life * 0.8).toFixed(2));
-        pathEl.setAttribute("filter", "url(#glow)");
-        
-        transmissionsGroup.appendChild(pathEl);
-        
-        // Add bright spot at current position
-        const currentX = transmission.startX + (transmission.endX - transmission.startX) * t;
-        const currentY = transmission.startY + (transmission.endY - transmission.startY) * t;
-        
-        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        circle.setAttribute("cx", currentX.toFixed(2));
-        circle.setAttribute("cy", currentY.toFixed(2));
-        circle.setAttribute("r", (3 * transmission.life).toFixed(2));
-        circle.setAttribute("fill", transmission.color);
-        circle.setAttribute("opacity", transmission.life.toFixed(2));
-        
-        transmissionsGroup.appendChild(circle);
-      }
-    }
-  };
-
-  // Removed emitLetterParticles, checkOrbLetterCollision, updateTitleLetterBounds
-
-  const animateParticles = () => {
-    if (!particlesGroupRef.current) return;
-    
-    // Regular particles
+    // Draw particles only
     particlesRef.current = particlesRef.current.filter(p => p.life > 0);
     
-    // Clear and redraw all particles
-    particlesGroupRef.current.innerHTML = '';
-    
-    // Draw regular particles
     for (const p of particlesRef.current) {
       p.x += p.vx;
       p.y += p.vy;
@@ -287,13 +188,11 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       p.life -= p.decay;
       p.opacity = Math.max(0, p.life);
       
-      const circ = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      circ.setAttribute("cx", p.x.toFixed(2));
-      circ.setAttribute("cy", p.y.toFixed(2));
-      circ.setAttribute("r", (p.r * p.opacity).toFixed(2));
-      circ.setAttribute("fill", p.color);
-      circ.setAttribute("opacity", (p.opacity * 0.7).toFixed(2));
-      particlesGroupRef.current.appendChild(circ);
+      ctx.globalAlpha = p.opacity * 0.7;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * p.opacity, 0, Math.PI * 2);
+      ctx.fill();
     }
   };
 
@@ -302,26 +201,53 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
 
   useEffect(() => {
     const svg = svgRef.current;
-    if (!svg) return;
+    const canvas = canvasRef.current;
+    if (!svg || !canvas) {
+      console.error('SVG or Canvas not initialized');
+      return;
+    }
+
+    // Set canvas size
+    const updateCanvasSize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    updateCanvasSize();
+    window.addEventListener('resize', updateCanvasSize);
+
+    const ctx = canvas.getContext('2d');
 
     // Precompute trig tables for parent and child point counts
-    getTrigTables(64);
+    getTrigTables(parentPoints);
     getTrigTables(childPoints);
-
-    // window.explodedLettersSet = explodedLettersRef.current; // Removed
 
     parentOrbRef.current = svg.querySelector('#parentOrb');
     childrenGroupRef.current = svg.querySelector('#children');
-    particlesGroupRef.current = svg.querySelector('#particles');
     
     const makeOrbState = () => ({
       drag: 0, dragTarget: 0, dragV: 0,
       squash: 0, squashTarget: 0, squashV: 0,
       mouseDir: 0, mouseDirTarget: 0, mouseDirV: 0,
       wobble: 0, lastUpdate: performance.now(),
-      parallaxOffset: 0, parallaxVelocity: 0,
+      parallaxOffset: { x: 0, y: 0 },
+      parallaxVelocity: { x: 0, y: 0 },
       isReturning: false, returnProgress: 0,
+      position: { x: 0, y: 0, z: 0 },
+      velocity: { x: 0, y: 0, z: 0 },
+      // 3D Orbital parameters
+      orbitalAngle: 0,  // Starting angle
+      orbitalRadius: 0, // Base radius
+      orbitalInclination: 0, // Tilt of orbital plane
+      orbitalEccentricity: 0, // How elliptical (0 = circle, 1 = very elliptical)
+      orbitalSpeed: 0, // Speed multiplier
+      orbitalPhase: 0, // Phase offset for variety
+      orbitalTilt: 0, // Additional axis tilt
+      // Dynamic orbital changes
+      orbitalPerturbation: { x: 0, y: 0, z: 0 }, // Temporary deviations
+      orbitalTarget: { radius: 0, inclination: 0, eccentricity: 0 }, // Target state to return to
+      wasVisible: true,
     });
+
 
     orbMorphDirections.length = 0;
     orbMorphSpeeds.length = 0;
@@ -335,6 +261,7 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
 
     orbStatesRef.current = [makeOrbState()]; // Parent
     childOrbsRef.current = [];
+    childPositionsRef.current = [];
     if (childrenGroupRef.current) {
         childrenGroupRef.current.innerHTML = '';
         for (let i = 0; i < childCount; i++) {
@@ -343,7 +270,33 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
             path.setAttribute("opacity", "0.95");
             childrenGroupRef.current.appendChild(path);
             childOrbsRef.current.push(path);
-            orbStatesRef.current.push(makeOrbState());
+            const childState = makeOrbState();
+            // Initialize 3D orbital parameters - all children orbit around parent
+            childState.orbitalAngle = (i * 2 * Math.PI / childCount); // Evenly spaced around circle
+            childState.initialAngle = (i * 2 * Math.PI / childCount); // Store initial angle
+            // Create cosmic orbital patterns with elliptical paths
+            const orbitalVariations = [
+              { radius: 60, inclination: Math.PI / 12, eccentricity: 0.6, speed: 1.2 },  // Fast inner ellipse
+              { radius: 85, inclination: -Math.PI / 8, eccentricity: 0.3, speed: 0.7 },  // Medium tilted orbit
+              { radius: 55, inclination: Math.PI / 6, eccentricity: 0.8, speed: 1.5 },   // Very fast, highly elliptical
+              { radius: 95, inclination: Math.PI / 4, eccentricity: 0.4, speed: 0.5 },   // Slow outer orbit
+              { radius: 75, inclination: -Math.PI / 10, eccentricity: 0.5, speed: 0.9 }  // Counter-tilted medium orbit
+            ];
+            const variation = orbitalVariations[i % orbitalVariations.length];
+            childState.orbitalRadius = variation.radius;
+            childState.orbitalInclination = variation.inclination;
+            childState.orbitalEccentricity = variation.eccentricity;
+            childState.orbitalSpeed = variation.speed;
+            childState.orbitalPhase = i * Math.PI / 3; // Different start phases
+            childState.orbitalTilt = 0; // No additional tilt
+            // Set targets for organized return
+            childState.orbitalTarget = {
+              radius: childState.orbitalRadius,
+              inclination: childState.orbitalInclination,
+              eccentricity: childState.orbitalEccentricity
+            };
+            orbStatesRef.current.push(childState);
+            childPositionsRef.current.push({ x: 0, y: 0, z: 0 });
         }
     }
 
@@ -362,9 +315,46 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       svg.setAttribute('height', vh.toString());
       svg.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
       
-      parentCenterBaseRef.current = { x: vw / 2, y: vh * 0.15 }; // Further adjusted Y position
-      parentCenterRef.current = { x: vw / 2, y: vh * 0.15 }; // Further adjusted Y position
-      orbScaleRef.current = scale;
+      // Position between navbar (height ~80px) and title (starts around 15% of viewport)
+      const navbarHeight = 80; // Approximate navbar height
+      const titleStartY = vh * 0.15; // Where title starts (from HeroSection pt values)
+      
+      // Calculate max orbital extent (largest orbit + child radius)
+      const maxOrbitalRadius = 95; // Largest orbit from orbital variations
+      const totalMaxRadius = maxOrbitalRadius + childRadius + 10; // Add buffer
+      
+      // Ensure parent is positioned so orbits don't go above navbar
+      const minY = navbarHeight + totalMaxRadius;
+      const maxY = titleStartY; // Can go behind title
+      const centerY = Math.max(minY, navbarHeight + (titleStartY - navbarHeight) / 2);
+      
+      // Dynamic positioning based on screen size
+      const isMobile = vw < 768;
+      const isTablet = vw >= 768 && vw < 1024;
+      
+      let rightOffset;
+      let dynamicScale;
+      
+      if (isMobile) {
+        rightOffset = 0; // Center on mobile
+        // Ensure orbs fit within viewport minus navbar
+        const availableHeight = vh - navbarHeight - 40; // 40px bottom buffer
+        const availableWidth = vw - 40; // 20px margins
+        const maxDimension = Math.min(availableWidth, availableHeight);
+        dynamicScale = Math.min(0.7, maxDimension / (totalMaxRadius * 2.2));
+      } else if (isTablet) {
+        rightOffset = vw * 0.1;
+        dynamicScale = 0.85;
+      } else {
+        rightOffset = Math.min(200, vw * 0.15);
+        dynamicScale = 1;
+      }
+      
+      const finalScale = scale * dynamicScale;
+      
+      parentCenterBaseRef.current = { x: vw * 0.5 + rightOffset, y: centerY };
+      parentCenterRef.current = { x: vw * 0.5 + rightOffset, y: centerY };
+      orbScaleRef.current = finalScale;
     };
 
     adjustSVGSize();
@@ -372,9 +362,6 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
 
     // Mouse move handler for cursor effect
     const handleMouseMove = (e) => {
-      const svg = svgRef.current;
-      if (!svg) return;
-      
       const rect = svg.getBoundingClientRect();
       mousePositionRef.current = {
         x: e.clientX - rect.left,
@@ -384,10 +371,18 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
 
     window.addEventListener('mousemove', handleMouseMove);
 
-    // Enhanced scroll handling with parallax
+    // Enhanced scroll handling - only affects parent orb
     const handleScroll = () => {
       const scrollY = window.scrollY;
+      const now = performance.now();
+      const dt = now - lastScrollTimeRef.current;
+      
+      if (dt > 0) {
+        scrollVelocityRef.current = (scrollY - scrollPositionRef.current) / dt * 120;
+      }
+      
       scrollPositionRef.current = scrollY;
+      lastScrollTimeRef.current = now;
       
       const heroHeight = window.innerHeight;
       const scrollProgress = Math.min(scrollY / heroHeight, 1);
@@ -403,34 +398,12 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
         }
       }
       
-      // Apply parallax to child orbs
-      orbStatesRef.current.forEach((state, i) => {
-        if (i === 0) return; // Skip parent orb
-        
-        const parallaxFactor = 0.3 + (i * 0.1);
-        const targetParallax = scrollY * parallaxFactor;
-        
-        // Check if orb should start returning when scrolling back up
-        if (isHeroVisibleRef.current && scrollProgress < 0.5) {
-          if (!state.isReturning && state.parallaxOffset > 20) {
-            state.isReturning = true;
-            state.returnProgress = 0;
-          }
-        }
-        
-        if (state.isReturning) {
-          state.returnProgress += 0.03;
-          const returnSpeed = 0.15 + state.returnProgress * 0.4;
-          state.parallaxOffset += (0 - state.parallaxOffset) * returnSpeed;
-          
-          if (Math.abs(state.parallaxOffset) < 2) {
-            state.isReturning = false;
-            state.parallaxOffset = 0;
-          }
-        } else if (scrollProgress > 0.1 && !isHeroVisibleRef.current) {
-          state.parallaxOffset += (targetParallax - state.parallaxOffset) * 0.1;
-        }
-      });
+      // Only parent orb responds to scroll - much gentler
+      const parentState = orbStatesRef.current[0];
+      if (parentState) {
+        parentState.dragTarget += scrollVelocityRef.current * 0.3;
+        parentVelocityRef.current.y = scrollVelocityRef.current * 0.15;
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -441,24 +414,20 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       lastWheelTimeRef.current = now;
       const velocity = Math.max(-80, Math.min(80, e.deltaY / dt * 120));
       
-      orbStatesRef.current.forEach((state, i) => {
-        if (orbMorphDirections[i] !== undefined) {
-            const angle = orbMorphDirections[i];
-            const randomFactor = 0.5 + Math.random();
-            state.dragTarget += (Math.sin(angle) * velocity * 1.8 + Math.cos(angle) * velocity * 0.7) * randomFactor;
-        }
-      });
+      // Only affect parent orb with wheel
+      const parentState = orbStatesRef.current[0];
+      if (parentState && orbMorphDirections[0] !== undefined) {
+        const angle = orbMorphDirections[0];
+        parentState.dragTarget += (Math.sin(angle) * velocity * 1.8 + Math.cos(angle) * velocity * 0.7);
+      }
       e.preventDefault();
     };
     
     const eventTarget = svg;
     eventTarget.addEventListener('wheel', handleWheel, { passive: false });
 
-    // Removed initial update of title bounds
-    // setTimeout(updateTitleLetterBounds, 100); 
-
     const animate = () => {
-      if (!svgRef.current || !parentOrbRef.current || !childrenGroupRef.current || !particlesGroupRef.current) {
+      if (!svgRef.current || !parentOrbRef.current || !childrenGroupRef.current) {
         animationFrameIdRef.current = requestAnimationFrame(animate);
         return;
       }
@@ -470,11 +439,6 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       }
 
       const now = performance.now();
-      if (now - lastFrameTimeRef.current < 33) {
-        animationFrameIdRef.current = requestAnimationFrame(animate);
-        return;
-      }
-      lastFrameTimeRef.current = now;
       
       // Update gradient colors in context for navbar orb
       const baseHue = (now * 0.01) % 360;
@@ -497,24 +461,24 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
         if (stopEl) stopEl.setAttribute("stop-color", hslToHex(hue, sat, light));
       }
 
-      for (let i = 0; i < orbStatesRef.current.length; i++) {
-        const state = orbStatesRef.current[i];
-        if (!state || orbMorphSpeeds[i] === undefined) continue;
-        const spring = 0.045 * (1 + orbMorphSpeeds[i]);
-        const damping = 0.90 - orbMorphSpeeds[i] * 0.33;
-        [state.drag, state.dragV] = dampedSpring(state.drag, state.dragTarget, state.dragV, spring, damping);
-        if (Math.abs(state.dragTarget) < 0.1 && Math.abs(state.drag) > 0.1) {
-          state.wobble += 0.04 + orbMorphSpeeds[i] * 0.9;
-          state.drag += Math.sin(state.wobble) * Math.max(0, Math.abs(state.drag) * 0.13 * (1 + orbMorphSpeeds[i]));
-        } else if (Math.abs(state.dragTarget) < 0.1) {
-          state.wobble = 0;
-        }
-        state.dragTarget = approach(state.dragTarget, 0, 0.018 + orbMorphSpeeds[i] * 0.6);
-      }
-      
+      // Update parent orb physics
       const parentState = orbStatesRef.current[0];
       if (parentState && orbMorphDirections[0] !== undefined) {
-        const parentMorphT = now * 0.0004;
+        const spring = 0.06 * (1 + orbMorphSpeeds[0]);
+        const damping = 0.94 - orbMorphSpeeds[0] * 0.2;
+        [parentState.drag, parentState.dragV] = dampedSpring(parentState.drag, parentState.dragTarget, parentState.dragV, spring, damping);
+        if (Math.abs(parentState.dragTarget) < 0.1 && Math.abs(parentState.drag) > 0.1) {
+          parentState.wobble += 0.04 + orbMorphSpeeds[0] * 0.9;
+          parentState.drag += Math.sin(parentState.wobble) * Math.max(0, Math.abs(parentState.drag) * 0.13 * (1 + orbMorphSpeeds[0]));
+        } else if (Math.abs(parentState.dragTarget) < 0.1) {
+          parentState.wobble = 0;
+        }
+        parentState.dragTarget = approach(parentState.dragTarget, 0, 0.025 + orbMorphSpeeds[0] * 0.4);
+      }
+      
+      // Update parent orb position
+      if (parentState && orbMorphDirections[0] !== undefined) {
+        const parentMorphT = now * 0.00015; // Much slower morphing
         const parentDrag = parentState.drag;
         const parentAngle = orbMorphDirections[0];
         const parentDx = Math.cos(parentAngle) * parentDrag;
@@ -522,35 +486,82 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
         const scale = orbScaleRef.current || 1;
         
         const { vw, vh } = viewportSizeRef.current;
-        // Add cursor effect to parent orb position
+        
+        // Gentler cursor effect
         const mouseX = mousePositionRef.current.x;
         const mouseY = mousePositionRef.current.y;
         const mouseDx = mouseX - parentCenterBaseRef.current.x;
         const mouseDy = mouseY - parentCenterBaseRef.current.y;
         const mouseDistance = Math.sqrt(mouseDx * mouseDx + mouseDy * mouseDy);
-        const maxMouseEffect = 30;
-        const mouseEffect = Math.max(0, 1 - mouseDistance / 300) * maxMouseEffect;
+        const maxMouseEffect = 20;
+        const mouseEffect = Math.max(0, 1 - mouseDistance / 400) * maxMouseEffect;
+        
+        // Smoother velocity damping
+        parentVelocityRef.current.x *= 0.97;
+        parentVelocityRef.current.y *= 0.96;
+        
+        // Gentler scroll response
+        const scrollOffset = scrollPositionRef.current * -0.08;
+        
+        // Subtle floating motion
+        const floatX = Math.sin(now * 0.0001) * 15 + Math.cos(now * 0.00015) * 10;
+        const floatY = Math.cos(now * 0.00012) * 10 + Math.sin(now * 0.00008) * 8;
         
         const px = parentCenterBaseRef.current.x + 
-                   Math.sin(now * 0.00011) * vw * 0.09 + 
-                   Math.cos(now * 0.00007) * vw * 0.07 +
-                   (mouseDx / mouseDistance || 0) * mouseEffect;
+                   floatX +
+                   (mouseDx / mouseDistance || 0) * mouseEffect +
+                   parentVelocityRef.current.x;
         const py = parentCenterBaseRef.current.y + 
-                   Math.cos(now * 0.00009) * vh * 0.08 + 
-                   Math.sin(now * 0.00016) * vh * 0.06 +
-                   (mouseDy / mouseDistance || 0) * mouseEffect;
+                   floatY +
+                   (mouseDy / mouseDistance || 0) * mouseEffect +
+                   parentVelocityRef.current.y +
+                   scrollOffset;
+        
         parentCenterRef.current = { x: px, y: py };
 
         const parentR = (parentRadius + parentDrag * 0.15) * scale;
         const parentAmp = (1 + Math.abs(parentDrag) * 0.008) * scale;
-        const parentPath = generateSuperSmoothBlob(px + parentDx * scale, py + parentDy * scale, parentR, 64, parentMorphT, parentAmp);
+        const parentPath = generateSuperSmoothBlob(px + parentDx * scale, py + parentDy * scale, parentR, parentPoints, parentMorphT, parentAmp);
         if (parentOrbRef.current) parentOrbRef.current.setAttribute('d', parentPath);
       }
 
+      // Update child orbs
       if (childrenGroupRef.current && childOrbsRef.current.length === childCount) {
-        for (let i = 0; i < childCount; i++) {
+        // Apply CSS rotation to the children group
+        const parentState = orbStatesRef.current[0];
+        if (parentState && orbMorphDirections[0] !== undefined) {
+          const scale = orbScaleRef.current || 1;
+          const parentAngle = orbMorphDirections[0];
+          const parentDrag = parentState.drag;
+          const parentDx = Math.cos(parentAngle) * parentDrag;
+          const parentDy = Math.sin(parentAngle) * parentDrag;
+          const parentX = parentCenterRef.current.x + parentDx * scale;
+          const parentY = parentCenterRef.current.y + parentDy * scale;
+          childrenGroupRef.current.style.transformOrigin = `${parentX}px ${parentY}px`;
+          // Apply time-based rotation to ensure movement
+          const rotationAngle = (now * 0.012) % 360; // Rotate based on time
+          childrenGroupRef.current.style.transformOrigin = `${parentX}px ${parentY}px`;
+          childrenGroupRef.current.style.transform = `rotate(${rotationAngle}deg)`;
+          childrenGroupRef.current.style.transition = 'none'; // Ensure smooth animation
+        }
+        // Create array with indices for z-sorting
+        const childIndices = Array.from({ length: childCount }, (_, i) => i);
+        
+        // Sort by z-position (back to front)
+        childIndices.sort((a, b) => {
+          const stateA = orbStatesRef.current[a + 1];
+          const stateB = orbStatesRef.current[b + 1];
+          return (stateA?.position?.z || 0) - (stateB?.position?.z || 0);
+        });
+        
+        for (let idx = 0; idx < childCount; idx++) {
+          const i = childIndices[idx];
           const state = orbStatesRef.current[i + 1];
           if (!state || orbMorphDirections[i+1] === undefined) continue;
+
+          // Minimal physics for child orbs to reduce interference with orbital motion
+          state.drag *= 0.95; // Simple damping
+          state.dragTarget = 0;
 
           const fam = getDynamicColorFamily(i, now);
           const tcol = 0.5 + 0.5 * Math.sin(now * 0.0005 + i);
@@ -559,120 +570,132 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           if (childGradStop0) childGradStop0.setAttribute("stop-color", lerpColor(fam[0], fam[1], tcol));
           if (childGradStop1) childGradStop1.setAttribute("stop-color", lerpColor(fam[1], fam[0], tcol));
           
-          const baseAngle = (now * 0.00022 + i * (2 * Math.PI / childCount));
+          // Use fixed angle for each child since CSS handles rotation
+          const angle = state.initialAngle || (i * 2 * Math.PI / childCount);
+          
+          // No perturbations for stable orbits
+          state.orbitalPerturbation.x = 0;
+          state.orbitalPerturbation.y = 0;
+          state.orbitalPerturbation.z = 0;
+          
           const { vw, vh } = viewportSizeRef.current;
           const currentParentR = (parentRadius + (orbStatesRef.current[0]?.drag || 0) * 0.15) * (orbScaleRef.current || 1);
           
-          const minEdge = Math.min(
-            parentCenterRef.current.x, vw - parentCenterRef.current.x,
-            parentCenterRef.current.y, vh - parentCenterRef.current.y
-          );
-          const maxChildOrbit = Math.max(40, minEdge - currentParentR - childRadius * (orbScaleRef.current || 1) - 16);
-          const orbitPhase = now * (0.00012 + 0.00007 * i) + i * 1.13;
-          const orbitWobble = Math.sin(orbitPhase) * 0.18 + Math.cos(orbitPhase * 0.7) * 0.09;
-          const minOrbit = currentParentR + childRadius * (orbScaleRef.current || 1) + 12;
-          let rawOrbit = (currentParentR + 60 + (i * 0.71 + 1.4) * maxChildOrbit / childCount) * (0.7 + 0.23 * orbitWobble);
-          const orbitRadiusVal = Math.max(rawOrbit, minOrbit);
+          // Simple 2D orbital calculations for clear motion
+          const r = state.orbitalRadius;
           
-          const ellipseA = orbitRadiusVal * 1.3 * (0.97 + 0.07 * Math.sin(now * 0.00013 + i));
-          const ellipseB = orbitRadiusVal * 1.1 * (0.97 + 0.07 * Math.cos(now * 0.00016 + i * 2));
-          const angle = baseAngle + Math.sin(now * 0.00009 + i * 1.7) * 0.22;
+          // Calculate orbital position relative to origin (0,0)
+          const orbitalX = r * Math.cos(angle);
+          const orbitalY = r * Math.sin(angle);
           
-          const dragAngle = orbMorphDirections[i + 1];
-          const dx = Math.cos(dragAngle) * state.drag;
-          const dy = Math.sin(dragAngle) * state.drag;
+          // Simple 3D tilt for visual interest
+          const inclination = state.orbitalInclination;
+          const finalX = orbitalX;
+          const finalY = orbitalY * Math.cos(inclination);
+          const finalZ = orbitalY * Math.sin(inclination);
           
-          // Apply parallax offset
-          const parallaxY = state.parallaxOffset * (1 + i * 0.2);
-          const parallaxX = state.parallaxOffset * 0.3 * Math.sin(i);
+          // Project 3D to 2D with perspective
+          const perspective = 800;
+          const scale3D = perspective / (perspective + finalZ);
           
-          // Add cursor effect to child orbs
-          const childMouseDx = mousePositionRef.current.x - (parentCenterRef.current.x + Math.cos(angle) * ellipseA);
-          const childMouseDy = mousePositionRef.current.y - (parentCenterRef.current.y + Math.sin(angle) * ellipseB);
-          const childMouseDistance = Math.sqrt(childMouseDx * childMouseDx + childMouseDy * childMouseDy);
-          const childMouseEffect = Math.max(0, 1 - childMouseDistance / 200) * 20 * (1 - i * 0.1);
-          
-          const x = parentCenterRef.current.x + 
-                    Math.cos(angle) * ellipseA + 
-                    dx + parallaxX +
-                    (childMouseDx / childMouseDistance || 0) * childMouseEffect;
-          const y = parentCenterRef.current.y + 
-                    Math.sin(angle) * ellipseB + 
-                    dy + parallaxY +
-                    (childMouseDy / childMouseDistance || 0) * childMouseEffect;
-          
+          // Get parent's current position (including any mouse effects from parent orb state)
+          const parentState = orbStatesRef.current[0];
+          const parentDrag = parentState?.drag || 0;
+          const parentDragAngle = orbMorphDirections[0] || 0;
+          const parentDx = Math.cos(parentDragAngle) * parentDrag;
+          const parentDy = Math.sin(parentDragAngle) * parentDrag;
           const scale = orbScaleRef.current || 1;
-          const cR = (childRadius + state.drag * 0.08) * scale;
-          const currentChildAmp = (childAmp + Math.abs(state.drag) * 0.006) * scale;
-          const morphT = now * 0.0005 + i * 10;
           
-          // Removed checkOrbLetterCollision(x, y, cR);
+          const parentX = parentCenterRef.current.x + parentDx * scale;
+          const parentY = parentCenterRef.current.y + parentDy * scale;
+          
+          // Position child relative to parent's actual position
+          const childX = parentX + finalX * scale3D * (orbScaleRef.current || 1);
+          const childY = parentY + finalY * scale3D * (orbScaleRef.current || 1);
+          
+          // Store 3D position
+          state.position.z = finalZ;
+          
+          // Remove drag effects for stable orbits
+          const dx = 0;
+          const dy = 0;
+          
+          // No collision detection - keep orbits stable
+          state.velocity.x = 0;
+          state.velocity.y = 0;
+          
+          // Check collision with parent
+          const distToParent = Math.sqrt((childX - parentX) * (childX - parentX) + (childY - parentY) * (childY - parentY));
+          const minDistance = (parentRadius + childRadius) * scale * 1.2; // Add some buffer
+          
+          let bounceX = 0, bounceY = 0;
+          if (distToParent < minDistance && distToParent > 0) {
+            // Calculate bounce direction (away from parent)
+            const pushX = (childX - parentX) / distToParent;
+            const pushY = (childY - parentY) / distToParent;
+            const pushForce = (minDistance - distToParent) * 0.5;
+            bounceX = pushX * pushForce;
+            bounceY = pushY * pushForce;
+          }
+          
+          // Use orbital position with bounce effect
+          const x = childX + dx + bounceX;
+          const y = childY + dy + bounceY;
+          
+          // Apply depth-based scaling and dimming
+          const depthScale = scale3D * 0.8 + 0.2; // Keep minimum 20% size
+          const depthOpacity = scale3D * 0.7 + 0.3; // Keep minimum 30% opacity
+          
+          const cR = (childRadius + state.drag * 0.08) * scale * depthScale;
+          const currentChildAmp = (childAmp + Math.abs(state.drag) * 0.006) * scale * depthScale;
+          const morphT = now * 0.0002 + i * 10; // Slower morphing
           
           const childPath = generateSuperSmoothBlob(x, y, cR, childPoints, morphT, currentChildAmp, i);
           
+          
           const path = childOrbsRef.current[i];
           if (path) {
+            path.setAttribute("d", childPath);
+            
             const fadeStart = 40, fadeEnd = 340;
             const fade = Math.min(1, Math.max(0, (fadeEnd - Math.abs(state.dragTarget)) / (fadeEnd - fadeStart)));
             
-            let reassemblyOffsetY = 0;
-            let reassemblyScaleFactor = 1;
-
             if (state.wasVisible === undefined) state.wasVisible = fade > 0.5;
-
-            if (!state.wasVisible && fade > 0.05 && fade < 0.7) {
-              const reassemblyProgress = fade / 0.7;
-              reassemblyOffsetY = (1 - reassemblyProgress) * (vh * 0.3);
-              reassemblyScaleFactor = 0.5 + reassemblyProgress * 0.5;
-            }
-            
-            const finalX = x;
-            const finalY = y + reassemblyOffsetY;
-            const finalCR = cR * reassemblyScaleFactor;
-            const finalChildAmp = currentChildAmp * reassemblyScaleFactor;
-
-            const reassembledChildPath = generateSuperSmoothBlob(finalX, finalY, finalCR, childPoints, morphT, finalChildAmp, i);
-            path.setAttribute("d", reassembledChildPath);
-
-            // Adjust opacity based on parallax and hero visibility
-            let parallaxFade = 1;
-            if (!isHeroVisibleRef.current && !state.isReturning) {
-              parallaxFade = Math.max(0, 1 - (state.parallaxOffset / (viewportSizeRef.current.vh * 0.3)));
-            } else if (state.isReturning) {
-              parallaxFade = 0.3 + state.returnProgress * 0.7;
-            }
-            
-            const finalOpacity = fade * 0.95 * Math.max(0.2, Math.min(1, parallaxFade));
 
             if (fade < 0.5 && fade > 0.05 && !state.isReturning) {
               const color = lerpColor(fam[0], fam[1], tcol);
-            const emission = Math.ceil((0.5 - fade) * 8);
-              emitParticles(finalX, finalY, color, emission, i, now);
-              path.setAttribute("opacity", finalOpacity.toFixed(2));
+              const emission = Math.ceil((0.5 - fade) * 8);
+              emitParticles(x, y, color, emission, i, now);
+              path.setAttribute("opacity", (fade * 0.95).toFixed(2));
             } else if (state.wasVisible && fade <= 0.05) {
               const color = lerpColor(fam[0], fam[1], tcol);
-              emitParticles(finalX, finalY, color, 6, i, now);
+              emitParticles(x, y, color, 6, i, now);
               path.setAttribute("opacity", "0");
               state.wasVisible = false;
             } else if (!state.wasVisible && fade > 0.05) {
               const color = lerpColor(fam[0], fam[1], tcol);
-              emitParticles(finalX, finalY, color, 5, i, now);
-              path.setAttribute("opacity", finalOpacity.toFixed(2));
+              emitParticles(x, y, color, 5, i, now);
+              path.setAttribute("opacity", (fade * 0.95).toFixed(2));
               state.wasVisible = true;
             } else {
-              path.setAttribute("opacity", finalOpacity.toFixed(2));
+              // Apply depth-based opacity
+              path.setAttribute("opacity", (0.95 * depthOpacity).toFixed(2));
             }
             
-            // Intermittently create data transmissions
-            if (Math.random() < 0.002 && fade > 0.8 && isHeroVisibleRef.current) {
-              const color = lerpColor(fam[0], fam[1], tcol);
-              createDataTransmission(i, parentCenterRef.current.x, parentCenterRef.current.y, finalX, finalY, color);
+            // Store position (for future use)
+            childPositionsRef.current[i] = { x, y, z: finalZ };
+            
+            // Update z-order in DOM
+            if (path.parentNode) {
+              path.parentNode.appendChild(path);
             }
           }
         }
       }
-      animateParticles();
-      animateDataTransmissions();
+      
+      // Render particles on canvas
+      renderCanvas(ctx, now);
+      
       animationFrameIdRef.current = requestAnimationFrame(animate);
     };
 
@@ -680,6 +703,7 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
 
     return () => {
       window.removeEventListener('resize', adjustSVGSize);
+      window.removeEventListener('resize', updateCanvasSize);
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);
       if (eventTarget) {
@@ -708,10 +732,31 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       style={style}
       className={className}
     >
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+        }}
+      />
+      <style>
+        {`
+          @keyframes rotateOrbs {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+          #children {
+            will-change: transform;
+          }
+        `}
+      </style>
       <svg 
         ref={svgRef} 
         id="orbSVG"
-        style={{ width: '100%', height: '100%' }}
+        style={{ width: '100%', height: '100%', position: 'relative' }}
       >
         <defs>
           <radialGradient id="parentGrad" cx="50%" cy="50%" r="70%">
@@ -748,8 +793,6 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
             </feMerge>
           </filter>
         </defs>
-        <g id="particles"></g>
-        <g id="dataTransmissions"></g>
         <path id="parentOrb" fill="url(#parentGrad)" opacity="0.95"/>
         <g id="children"></g>
       </svg>
