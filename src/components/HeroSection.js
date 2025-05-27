@@ -40,7 +40,7 @@ export default function HeroSection() {
       <AnimatedOrbHeroBG
         width={480}
         height={480}
-        zIndex={1} // Above background (0) but below navbar (1301)
+        zIndex={0} // Behind everything except background
         visible={showOrb}
         // When hero is not visible, trigger dispersal (handled in AnimatedOrbHeroBG)
         disperse={!showOrb}

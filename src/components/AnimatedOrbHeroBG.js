@@ -48,6 +48,8 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
   const isHeroVisibleRef = useRef(true);
   const childPositionsRef = useRef([]);
   const parentVelocityRef = useRef({ x: 0, y: 0 });
+  const dataTransmissionsRef = useRef([]);
+  const lastTransmissionTimeRef = useRef({});
 
   const childCount = 5;
   const parentRadius = 30; // Reduced by 20% more (37 * 0.8)
@@ -169,6 +171,66 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
     }
   };
 
+
+  const createDataTransmission = (childIndex, childX, childY, parentX, parentY, color) => {
+    const transmissionId = `${childIndex}_${Date.now()}`;
+    dataTransmissionsRef.current.push({
+      id: transmissionId,
+      childIndex,
+      startX: childX,
+      startY: childY,
+      endX: parentX,
+      endY: parentY,
+      progress: 0,
+      color,
+      opacity: 0.3, // Very subtle effect
+    });
+  };
+
+  const updateDataTransmissions = () => {
+    const transmissionsGroup = svgRef.current?.querySelector('#dataTransmissions');
+    if (!transmissionsGroup) return;
+    
+    // Clear previous transmissions
+    transmissionsGroup.innerHTML = '';
+    
+    // Update and filter active transmissions
+    dataTransmissionsRef.current = dataTransmissionsRef.current.filter(t => t.progress < 1);
+    
+    for (const transmission of dataTransmissionsRef.current) {
+      transmission.progress += 0.02; // Slow transmission speed
+      
+      if (transmission.progress < 1) {
+        // Create a subtle lightning path
+        const t = transmission.progress;
+        const midX = transmission.startX + (transmission.endX - transmission.startX) * t;
+        const midY = transmission.startY + (transmission.endY - transmission.startY) * t;
+        
+        // Simple line with slight opacity fade
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", transmission.startX);
+        line.setAttribute("y1", transmission.startY);
+        line.setAttribute("x2", midX);
+        line.setAttribute("y2", midY);
+        line.setAttribute("stroke", transmission.color);
+        line.setAttribute("stroke-width", "1");
+        line.setAttribute("opacity", (transmission.opacity * (1 - t * 0.5)).toFixed(2));
+        line.setAttribute("filter", "url(#glow)");
+        
+        transmissionsGroup.appendChild(line);
+        
+        // Small dot at the end
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", midX.toFixed(1));
+        circle.setAttribute("cy", midY.toFixed(1));
+        circle.setAttribute("r", "2");
+        circle.setAttribute("fill", transmission.color);
+        circle.setAttribute("opacity", (transmission.opacity * 2 * (1 - t)).toFixed(2));
+        
+        transmissionsGroup.appendChild(circle);
+      }
+    }
+  };
 
   // Canvas-based particle rendering for performance
   const renderCanvas = (ctx, now) => {
@@ -324,9 +386,9 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       const totalMaxRadius = maxOrbitalRadius + childRadius + 10; // Add buffer
       
       // Ensure parent is positioned so orbits don't go above navbar
-      const minY = navbarHeight + totalMaxRadius;
-      const maxY = titleStartY; // Can go behind title
-      const centerY = Math.max(minY, navbarHeight + (titleStartY - navbarHeight) / 2);
+      const minY = navbarHeight + totalMaxRadius + 20; // Add extra buffer to ensure no navbar overlap
+      const maxY = titleStartY + 50; // Can go slightly behind title
+      const centerY = Math.max(minY, navbarHeight + (titleStartY - navbarHeight) * 0.7); // Move orb lower
       
       // Dynamic positioning based on screen size
       const isMobile = vw < 768;
@@ -487,6 +549,11 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
         
         const { vw, vh } = viewportSizeRef.current;
         
+        // Define safe zones based on navbar and orb dimensions
+        const navbarHeight = 80;
+        const maxOrbitalRadius = 95;
+        const totalMaxRadius = maxOrbitalRadius + childRadius + 10;
+        
         // Gentler cursor effect
         const mouseX = mousePositionRef.current.x;
         const mouseY = mousePositionRef.current.y;
@@ -500,8 +567,8 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
         parentVelocityRef.current.x *= 0.97;
         parentVelocityRef.current.y *= 0.96;
         
-        // Gentler scroll response
-        const scrollOffset = scrollPositionRef.current * -0.08;
+        // Gentler scroll response with bounds checking
+        const scrollOffset = Math.max(-50, Math.min(50, scrollPositionRef.current * -0.08));
         
         // Subtle floating motion
         const floatX = Math.sin(now * 0.0001) * 15 + Math.cos(now * 0.00015) * 10;
@@ -511,11 +578,17 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
                    floatX +
                    (mouseDx / mouseDistance || 0) * mouseEffect +
                    parentVelocityRef.current.x;
-        const py = parentCenterBaseRef.current.y + 
-                   floatY +
-                   (mouseDy / mouseDistance || 0) * mouseEffect +
-                   parentVelocityRef.current.y +
-                   scrollOffset;
+        // Calculate parent Y with bounds to prevent navbar overlap
+        const baseY = parentCenterBaseRef.current.y;
+        const proposedY = baseY + 
+                         floatY +
+                         (mouseDy / mouseDistance || 0) * mouseEffect +
+                         parentVelocityRef.current.y +
+                         scrollOffset;
+        
+        // Ensure orb doesn't go above safe zone (navbar + buffer)
+        const safeMinY = navbarHeight + totalMaxRadius + 20;
+        const py = Math.max(safeMinY, proposedY);
         
         parentCenterRef.current = { x: px, y: py };
 
@@ -565,9 +638,10 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
 
           const fam = getDynamicColorFamily(i, now);
           const tcol = 0.5 + 0.5 * Math.sin(now * 0.0005 + i);
+          const childColor = lerpColor(fam[0], fam[1], tcol);
           const childGradStop0 = svgRef.current.querySelector(`#c${i}s0`);
           const childGradStop1 = svgRef.current.querySelector(`#c${i}s1`);
-          if (childGradStop0) childGradStop0.setAttribute("stop-color", lerpColor(fam[0], fam[1], tcol));
+          if (childGradStop0) childGradStop0.setAttribute("stop-color", childColor);
           if (childGradStop1) childGradStop1.setAttribute("stop-color", lerpColor(fam[1], fam[0], tcol));
           
           // Use fixed angle for each child since CSS handles rotation
@@ -685,6 +759,21 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
             // Store position (for future use)
             childPositionsRef.current[i] = { x, y, z: finalZ };
             
+            // Check for color matching and create data transmission
+            // Get parent color
+            const parentStop0 = svgRef.current.querySelector('#p0');
+            const parentColor = parentStop0?.getAttribute('stop-color') || '#00E5FF';
+            
+            // Simple color similarity check (comparing first few characters)
+            const colorMatch = childColor.substring(0, 4) === parentColor.substring(0, 4);
+            
+            // Intermittent transmission (random chance when colors match)
+            const timeSinceLastTransmission = now - (lastTransmissionTimeRef.current[i] || 0);
+            if (colorMatch && timeSinceLastTransmission > 3000 && Math.random() < 0.15) {
+              createDataTransmission(i, x, y, parentX, parentY, childColor);
+              lastTransmissionTimeRef.current[i] = now;
+            }
+            
             // Update z-order in DOM
             if (path.parentNode) {
               path.parentNode.appendChild(path);
@@ -692,6 +781,9 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           }
         }
       }
+      
+      // Update data transmissions
+      updateDataTransmissions();
       
       // Render particles on canvas
       renderCanvas(ctx, now);
@@ -794,6 +886,7 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           </filter>
         </defs>
         <path id="parentOrb" fill="url(#parentGrad)" opacity="0.95"/>
+        <g id="dataTransmissions"></g>
         <g id="children"></g>
       </svg>
     </Box>
