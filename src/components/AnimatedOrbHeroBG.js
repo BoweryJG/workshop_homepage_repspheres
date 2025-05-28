@@ -174,17 +174,21 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
 
   const createDataTransmission = (childIndex, childX, childY, parentX, parentY, color) => {
     const transmissionId = `${childIndex}_${Date.now()}`;
-    dataTransmissionsRef.current.push({
-      id: transmissionId,
-      childIndex,
-      startX: childX,
-      startY: childY,
-      endX: parentX,
-      endY: parentY,
-      progress: 0,
-      color,
-      opacity: 0.3, // Very subtle effect
-    });
+    // Create multiple particles for a stream effect
+    for (let p = 0; p < 3; p++) {
+      dataTransmissionsRef.current.push({
+        id: `${transmissionId}_${p}`,
+        childIndex,
+        startX: childX,
+        startY: childY,
+        endX: parentX,
+        endY: parentY,
+        progress: -p * 0.15, // Stagger the particles
+        color,
+        opacity: 0.6, // More visible effect
+        particleIndex: p,
+      });
+    }
   };
 
   const updateDataTransmissions = () => {
@@ -198,36 +202,51 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
     dataTransmissionsRef.current = dataTransmissionsRef.current.filter(t => t.progress < 1);
     
     for (const transmission of dataTransmissionsRef.current) {
-      transmission.progress += 0.02; // Slow transmission speed
+      transmission.progress += 0.025; // Moderate transmission speed
       
-      if (transmission.progress < 1) {
-        // Create a subtle lightning path
-        const t = transmission.progress;
-        const midX = transmission.startX + (transmission.endX - transmission.startX) * t;
-        const midY = transmission.startY + (transmission.endY - transmission.startY) * t;
+      if (transmission.progress < 1 && transmission.progress > 0) {
+        // Create a data packet visualization
+        const t = Math.max(0, Math.min(1, transmission.progress));
         
-        // Simple line with slight opacity fade
-        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        line.setAttribute("x1", transmission.startX);
-        line.setAttribute("y1", transmission.startY);
-        line.setAttribute("x2", midX);
-        line.setAttribute("y2", midY);
-        line.setAttribute("stroke", transmission.color);
-        line.setAttribute("stroke-width", "1");
-        line.setAttribute("opacity", (transmission.opacity * (1 - t * 0.5)).toFixed(2));
-        line.setAttribute("filter", "url(#glow)");
+        // Add some curve to the path
+        const curve = Math.sin(t * Math.PI) * 20;
+        const angle = Math.atan2(transmission.endY - transmission.startY, transmission.endX - transmission.startX);
+        const perpX = -Math.sin(angle) * curve;
+        const perpY = Math.cos(angle) * curve;
         
-        transmissionsGroup.appendChild(line);
+        const currentX = transmission.startX + (transmission.endX - transmission.startX) * t + perpX;
+        const currentY = transmission.startY + (transmission.endY - transmission.startY) * t + perpY;
         
-        // Small dot at the end
-        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        circle.setAttribute("cx", midX.toFixed(1));
-        circle.setAttribute("cy", midY.toFixed(1));
-        circle.setAttribute("r", "2");
-        circle.setAttribute("fill", transmission.color);
-        circle.setAttribute("opacity", (transmission.opacity * 2 * (1 - t)).toFixed(2));
+        // Data packet (glowing orb)
+        const packet = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        packet.setAttribute("cx", currentX.toFixed(1));
+        packet.setAttribute("cy", currentY.toFixed(1));
+        packet.setAttribute("r", (4 - transmission.particleIndex * 0.5).toFixed(1));
+        packet.setAttribute("fill", transmission.color);
+        packet.setAttribute("opacity", (transmission.opacity * (1 - t * 0.2) * (1 - transmission.particleIndex * 0.2)).toFixed(2));
+        packet.setAttribute("filter", "url(#dataGlow)");
         
-        transmissionsGroup.appendChild(circle);
+        transmissionsGroup.appendChild(packet);
+        
+        // Trail effect
+        if (transmission.particleIndex === 0) {
+          const trail = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          const trailLength = 0.15;
+          const trailStart = Math.max(0, t - trailLength);
+          const startX = transmission.startX + (transmission.endX - transmission.startX) * trailStart + perpX * trailStart / t;
+          const startY = transmission.startY + (transmission.endY - transmission.startY) * trailStart + perpY * trailStart / t;
+          
+          trail.setAttribute("x1", startX.toFixed(1));
+          trail.setAttribute("y1", startY.toFixed(1));
+          trail.setAttribute("x2", currentX.toFixed(1));
+          trail.setAttribute("y2", currentY.toFixed(1));
+          trail.setAttribute("stroke", transmission.color);
+          trail.setAttribute("stroke-width", "1");
+          trail.setAttribute("opacity", (transmission.opacity * 0.3 * (1 - t)).toFixed(2));
+          trail.setAttribute("stroke-linecap", "round");
+          
+          transmissionsGroup.appendChild(trail);
+        }
       }
     }
   };
@@ -768,9 +787,9 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
             // Simple color similarity check (comparing first few characters)
             const colorMatch = childColor.substring(0, 4) === parentColor.substring(0, 4);
             
-            // Intermittent transmission (random chance when colors match)
+            // Intermittent transmission (random chance)
             const timeSinceLastTransmission = now - (lastTransmissionTimeRef.current[i] || 0);
-            if (colorMatch && timeSinceLastTransmission > 3000 && Math.random() < 0.15) {
+            if (timeSinceLastTransmission > 4000 && Math.random() < 0.08) {
               createDataTransmission(i, x, y, parentX, parentY, childColor);
               lastTransmissionTimeRef.current[i] = now;
             }
@@ -880,6 +899,14 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           </radialGradient>
           <filter id="glow">
             <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          <filter id="dataGlow">
+            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+            <feColorMatrix in="coloredBlur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 2 0"/>
             <feMerge>
               <feMergeNode in="coloredBlur"/>
               <feMergeNode in="SourceGraphic"/>
