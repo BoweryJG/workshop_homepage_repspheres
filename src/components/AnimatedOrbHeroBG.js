@@ -385,10 +385,10 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       const maxOrbitalRadius = 95; // Largest orbit from orbital variations
       const totalMaxRadius = maxOrbitalRadius + childRadius + 10; // Add buffer
       
-      // Start orbs right under the nav bar buttons (right side)
-      const minY = navbarHeight + 5; // Just below navbar
-      const maxY = navbarHeight + 150; // Keep orbs in upper area, away from title
-      const centerY = navbarHeight + 20; // Start position immediately under nav buttons
+      // Start orbs at navbar level (right side)
+      const minY = navbarHeight - 20; // Can overlap with navbar bottom
+      const maxY = navbarHeight + 80; // Keep orbs very high up
+      const centerY = navbarHeight; // Start position at navbar level
       
       // Dynamic positioning based on screen size
       const isMobile = vw < 768;
@@ -586,9 +586,9 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
                          parentVelocityRef.current.y +
                          scrollOffset;
         
-        // Keep orb in upper area near navbar, away from title
-        const safeMinY = navbarHeight + 10;
-        const safeMaxY = navbarHeight + 120; // Constrain to upper area
+        // Keep orb at navbar level
+        const safeMinY = navbarHeight - 30; // Allow overlap with navbar
+        const safeMaxY = navbarHeight + 60; // Very constrained to top
         const py = Math.min(safeMaxY, Math.max(safeMinY, proposedY));
         
         parentCenterRef.current = { x: px, y: py };
