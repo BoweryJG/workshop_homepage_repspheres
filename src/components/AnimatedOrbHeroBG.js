@@ -729,16 +729,16 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           }
           
           // Handle dispersal/reassembly animations
-          let finalX = childX + dx + bounceX;
-          let finalY = childY + dy + bounceY;
+          let animX = childX + dx + bounceX;
+          let animY = childY + dy + bounceY;
           
           if (state.dispersed) {
             // Animate to dispersed position
             state.disperseProgress = Math.min(1, state.disperseProgress + 0.02);
             const t = state.disperseProgress;
             const easeOut = 1 - Math.pow(1 - t, 3);
-            finalX = childX + (state.disperseTarget.x - childX) * easeOut;
-            finalY = childY + (state.disperseTarget.y - childY) * easeOut;
+            animX = childX + (state.disperseTarget.x - childX) * easeOut;
+            animY = childY + (state.disperseTarget.y - childY) * easeOut;
           } else if (state.assembleProgress < 1) {
             // Animate reassembly from below/behind
             state.assembleProgress = Math.min(1, state.assembleProgress + 0.015);
@@ -746,15 +746,15 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
             const easeInOut = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
             
             // Start from below and behind
-            const startX = state.disperseTarget.x || finalX;
+            const startX = state.disperseTarget.x || animX;
             const startY = viewportSizeRef.current.vh + 100;
             
-            finalX = startX + (childX - startX) * easeInOut;
-            finalY = startY + (childY - startY) * easeInOut;
+            animX = startX + (childX - startX) * easeInOut;
+            animY = startY + (childY - startY) * easeInOut;
           }
           
-          const x = finalX;
-          const y = finalY;
+          const x = animX;
+          const y = animY;
           
           // Apply depth-based scaling and dimming - children get smaller when scrolling
           const scrollChildScale = 1 - Math.abs(scrollVelocityRef.current) * 0.0001;
