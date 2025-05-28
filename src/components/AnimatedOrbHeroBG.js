@@ -364,7 +364,7 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
             childState.initialAngle = childState.orbitalAngle; // Store initial angle
             
             // Create completely unique orbital parameters for each child
-            const uniqueRadius = 40 + Math.random() * 60; // Radius between 40-100
+            const uniqueRadius = 80 + Math.random() * 80; // Radius between 80-160 for more space
             const uniqueInclination = (Math.random() - 0.5) * Math.PI / 3; // Random tilt
             const uniqueEccentricity = 0.1 + Math.random() * 0.7; // From nearly circular to very elliptical
             const uniqueSpeed = 0.5 + Math.random() * 1.0; // Speed varies from 0.5x to 1.5x
@@ -373,7 +373,7 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
             childState.orbitalWobbleSpeed = 0.5 + Math.random() * 1.0; // How fast the orbit wobbles
             childState.orbitalWobbleAmount = 0.05 + Math.random() * 0.15; // How much the orbit wobbles
             childState.radiusOscillationSpeed = 0.3 + Math.random() * 0.7; // How fast radius changes
-            childState.radiusOscillationAmount = 5 + Math.random() * 20; // How much radius changes
+            childState.radiusOscillationAmount = 10 + Math.random() * 30; // How much radius changes (increased for more variation)
             
             const variation = {
               radius: uniqueRadius,
