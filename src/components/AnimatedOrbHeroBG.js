@@ -364,11 +364,11 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
             childState.initialAngle = (i * 2 * Math.PI / childCount); // Store initial angle
             // Create cosmic orbital patterns with elliptical paths
             const orbitalVariations = [
-              { radius: 60, inclination: Math.PI / 12, eccentricity: 0.6, speed: 2.5 },  // Much faster inner ellipse
-              { radius: 85, inclination: -Math.PI / 8, eccentricity: 0.3, speed: 1.8 },  // Faster tilted orbit
-              { radius: 55, inclination: Math.PI / 6, eccentricity: 0.8, speed: 3.0 },   // Very fast, highly elliptical
-              { radius: 95, inclination: Math.PI / 4, eccentricity: 0.4, speed: 1.2 },   // Moderate outer orbit
-              { radius: 75, inclination: -Math.PI / 10, eccentricity: 0.5, speed: 2.0 }  // Faster counter-tilted orbit
+              { radius: 60, inclination: Math.PI / 12, eccentricity: 0.6, speed: 0.8 },   // Slow inner ellipse
+              { radius: 85, inclination: -Math.PI / 8, eccentricity: 0.3, speed: 0.5 },   // Very slow tilted orbit
+              { radius: 55, inclination: Math.PI / 6, eccentricity: 0.8, speed: 1.0 },    // Slightly faster, still slow
+              { radius: 95, inclination: Math.PI / 4, eccentricity: 0.4, speed: 0.3 },    // Extremely slow outer orbit
+              { radius: 75, inclination: -Math.PI / 10, eccentricity: 0.5, speed: 0.6 }   // Slow counter-tilted orbit
             ];
             const variation = orbitalVariations[i % orbitalVariations.length];
             childState.orbitalRadius = variation.radius;
@@ -653,9 +653,9 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           if (state.orbitalAngle === undefined || isNaN(state.orbitalAngle)) {
             state.orbitalAngle = (i * 2 * Math.PI / childCount);
           }
-          // FORCE continuous motion - use the speed from orbital variations
+          // Lava lamp speed - very slow and hypnotic
           const speed = state.orbitalSpeed || 1;
-          state.orbitalAngle += speed * 0.03; // Visible speed
+          state.orbitalAngle += speed * 0.002; // Much slower, lava lamp flow
           const angle = state.orbitalAngle;
           
           // No perturbations for stable orbits
