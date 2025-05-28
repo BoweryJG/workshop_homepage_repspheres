@@ -875,17 +875,6 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           height: '100%',
         }}
       />
-      <style>
-        {`
-          @keyframes rotateOrbs {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-          #children {
-            will-change: transform;
-          }
-        `}
-      </style>
       <svg 
         ref={svgRef} 
         id="orbSVG"
