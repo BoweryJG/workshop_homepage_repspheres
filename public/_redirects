@@ -7,7 +7,7 @@
 /workspace/*  https://workspace-jg.netlify.app/:splat  200
 
 # Conversation Analysis (Sales call analysis and personality insights)
-/conversation-analysis/*  https://linguisticsjg.netlify.app/:splat  200
+/conversation-analysis/*  https://linguistics.repspheres.com/:splat  200
 
 # CRM Hub (Central command center for all data and automations)
 /crm/*  https://sphereoscrm.netlify.app/:splat  200
