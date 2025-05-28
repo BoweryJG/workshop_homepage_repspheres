@@ -52,8 +52,8 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
   const lastTransmissionTimeRef = useRef({});
 
   const childCount = 5;
-  const parentRadius = 45; // Increased for more impact
-  const childRadius = 18; // Increased for better visibility
+  const parentRadius = 36; // 20% smaller than 45
+  const childRadius = 14; // 20% smaller than 18
   const parentPoints = 64; // Balanced for performance
   const childPoints = 32; // Optimized for smooth performance
   const childAmp = 0.3; // Reduced amplitude for smoother shapes
@@ -385,10 +385,10 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       const maxOrbitalRadius = 95; // Largest orbit from orbital variations
       const totalMaxRadius = maxOrbitalRadius + childRadius + 10; // Add buffer
       
-      // Position orbs in space between navbar and title
-      const minY = navbarHeight + parentRadius + 10; // Just below navbar
-      const maxY = titleStartY - parentRadius - 10; // Above title
-      const centerY = navbarHeight + (titleStartY - navbarHeight) * 0.3; // Float in upper area
+      // Start orbs right under the nav bar buttons (right side)
+      const minY = navbarHeight + 5; // Just below navbar
+      const maxY = titleStartY - totalMaxRadius - 20; // Never go behind title
+      const centerY = navbarHeight + 40; // Start position right under nav buttons
       
       // Dynamic positioning based on screen size
       const isMobile = vw < 768;
@@ -398,7 +398,7 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       let dynamicScale;
       
       if (isMobile) {
-        rightOffset = 0; // Center on mobile
+        rightOffset = 20; // Slight right offset on mobile
         // Ensure orbs fit within viewport minus navbar
         const availableHeight = vh - navbarHeight - 40; // 40px bottom buffer
         const availableWidth = vw - 40; // 20px margins
@@ -408,7 +408,7 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
         rightOffset = vw * 0.1;
         dynamicScale = 0.95;
       } else {
-        rightOffset = Math.min(200, vw * 0.15);
+        rightOffset = Math.min(150, vw * 0.12); // Position under login/signup buttons
         dynamicScale = 1;
       }
       
