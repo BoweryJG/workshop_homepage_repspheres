@@ -52,10 +52,10 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
   const lastTransmissionTimeRef = useRef({});
 
   const childCount = 5;
-  const parentRadius = 30; // Reduced by 20% more (37 * 0.8)
-  const childRadius = 11; // Reduced by 20% more (14 * 0.8)
-  const parentPoints = 128; // High detail for smooth animation
-  const childPoints = 64; // High detail for smooth animation
+  const parentRadius = 45; // Increased for more impact
+  const childRadius = 18; // Increased for better visibility
+  const parentPoints = 64; // Balanced for performance
+  const childPoints = 32; // Optimized for smooth performance
   const childAmp = 0.3; // Reduced amplitude for smoother shapes
   const orbMorphDirections = [];
   const orbMorphSpeeds = [];
@@ -385,10 +385,10 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       const maxOrbitalRadius = 95; // Largest orbit from orbital variations
       const totalMaxRadius = maxOrbitalRadius + childRadius + 10; // Add buffer
       
-      // Ensure parent is positioned so orbits don't go above navbar
-      const minY = navbarHeight + totalMaxRadius + 20; // Add extra buffer to ensure no navbar overlap
-      const maxY = titleStartY + 50; // Can go slightly behind title
-      const centerY = Math.max(minY, navbarHeight + (titleStartY - navbarHeight) * 0.7); // Move orb lower
+      // Position orbs in space between navbar and title
+      const minY = navbarHeight + parentRadius + 10; // Just below navbar
+      const maxY = titleStartY - parentRadius - 10; // Above title
+      const centerY = navbarHeight + (titleStartY - navbarHeight) * 0.3; // Float in upper area
       
       // Dynamic positioning based on screen size
       const isMobile = vw < 768;
@@ -403,10 +403,10 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
         const availableHeight = vh - navbarHeight - 40; // 40px bottom buffer
         const availableWidth = vw - 40; // 20px margins
         const maxDimension = Math.min(availableWidth, availableHeight);
-        dynamicScale = Math.min(0.7, maxDimension / (totalMaxRadius * 2.2));
+        dynamicScale = Math.min(0.85, maxDimension / (totalMaxRadius * 2.2));
       } else if (isTablet) {
         rightOffset = vw * 0.1;
-        dynamicScale = 0.85;
+        dynamicScale = 0.95;
       } else {
         rightOffset = Math.min(200, vw * 0.15);
         dynamicScale = 1;
