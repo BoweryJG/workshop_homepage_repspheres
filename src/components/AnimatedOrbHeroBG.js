@@ -387,8 +387,8 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       
       // Start orbs right under the nav bar buttons (right side)
       const minY = navbarHeight + 5; // Just below navbar
-      const maxY = titleStartY - totalMaxRadius - 20; // Never go behind title
-      const centerY = navbarHeight + 40; // Start position right under nav buttons
+      const maxY = navbarHeight + 150; // Keep orbs in upper area, away from title
+      const centerY = navbarHeight + 20; // Start position immediately under nav buttons
       
       // Dynamic positioning based on screen size
       const isMobile = vw < 768;
@@ -408,7 +408,7 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
         rightOffset = vw * 0.1;
         dynamicScale = 0.95;
       } else {
-        rightOffset = Math.min(150, vw * 0.12); // Position under login/signup buttons
+        rightOffset = Math.min(100, vw * 0.08); // Position further right, under nav buttons
         dynamicScale = 1;
       }
       
@@ -586,9 +586,10 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
                          parentVelocityRef.current.y +
                          scrollOffset;
         
-        // Ensure orb doesn't go above safe zone (navbar + buffer)
-        const safeMinY = navbarHeight + totalMaxRadius + 20;
-        const py = Math.max(safeMinY, proposedY);
+        // Keep orb in upper area near navbar, away from title
+        const safeMinY = navbarHeight + 10;
+        const safeMaxY = navbarHeight + 120; // Constrain to upper area
+        const py = Math.min(safeMaxY, Math.max(safeMinY, proposedY));
         
         parentCenterRef.current = { x: px, y: py };
 
