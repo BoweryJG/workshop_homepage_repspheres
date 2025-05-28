@@ -657,10 +657,12 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           if (childGradStop1) childGradStop1.setAttribute("stop-color", lerpColor(fam[1], fam[0], tcol));
           
           // Independent orbital motion for each child
-          if (state.orbitalAngle === undefined) {
+          if (state.orbitalAngle === undefined || isNaN(state.orbitalAngle)) {
             state.orbitalAngle = (i * 2 * Math.PI / childCount);
           }
-          state.orbitalAngle += state.orbitalSpeed * 0.05; // Much faster for clearly visible motion
+          // FORCE continuous motion - use the speed from orbital variations
+          const speed = state.orbitalSpeed || 1;
+          state.orbitalAngle += speed * 0.03; // Visible speed
           const angle = state.orbitalAngle;
           
           // No perturbations for stable orbits
