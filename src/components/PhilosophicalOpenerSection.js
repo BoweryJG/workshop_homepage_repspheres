@@ -33,7 +33,7 @@ export default function PhilosophicalOpenerSection() {
           <Typography
             variant="h3"
             sx={{
-              fontFamily: "'Playfair Display', 'Georgia', serif",
+              fontFamily: 'Playfair Display, Georgia, serif',
               fontWeight: 400,
               fontSize: { xs: '2rem', md: '3rem', lg: '3.5rem' },
               mb: 6,
@@ -48,7 +48,7 @@ export default function PhilosophicalOpenerSection() {
                 top: -20,
                 fontSize: { xs: '4rem', md: '6rem' },
                 color: 'rgba(0,255,198,0.2)',
-                fontFamily: "'Georgia', serif",
+                fontFamily: 'Georgia, serif',
               },
               '&:after': {
                 content: '"""',
@@ -57,7 +57,7 @@ export default function PhilosophicalOpenerSection() {
                 bottom: -40,
                 fontSize: { xs: '4rem', md: '6rem' },
                 color: 'rgba(123,66,246,0.2)',
-                fontFamily: "'Georgia', serif",
+                fontFamily: 'Georgia, serif',
               },
             }}
           >
@@ -80,7 +80,7 @@ export default function PhilosophicalOpenerSection() {
           <Typography
             variant="h5"
             sx={{
-              fontFamily: "'DM Sans', Arial, sans-serif",
+              fontFamily: 'DM Sans, Arial, sans-serif',
               fontWeight: 500,
               fontSize: { xs: '1.3rem', md: '1.6rem', lg: '1.8rem' },
               lineHeight: 1.6,
@@ -119,7 +119,7 @@ export default function PhilosophicalOpenerSection() {
               </Box>
               <Typography
                 sx={{
-                  fontFamily: "'Space Grotesk', Arial, sans-serif",
+                  fontFamily: 'Space Grotesk, Arial, sans-serif',
                   fontSize: '0.9rem',
                   color: 'rgba(255,255,255,0.7)',
                   fontWeight: 600,
@@ -166,7 +166,7 @@ export default function PhilosophicalOpenerSection() {
               </Box>
               <Typography
                 sx={{
-                  fontFamily: "'Space Grotesk', Arial, sans-serif",
+                  fontFamily: 'Space Grotesk, Arial, sans-serif',
                   fontSize: '0.9rem',
                   color: 'rgba(255,255,255,0.7)',
                   fontWeight: 600,
@@ -213,7 +213,7 @@ export default function PhilosophicalOpenerSection() {
               </Box>
               <Typography
                 sx={{
-                  fontFamily: "'Space Grotesk', Arial, sans-serif",
+                  fontFamily: 'Space Grotesk, Arial, sans-serif',
                   fontSize: '0.9rem',
                   color: 'rgba(255,255,255,0.7)',
                   fontWeight: 600,
