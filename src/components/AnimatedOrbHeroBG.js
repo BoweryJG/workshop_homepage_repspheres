@@ -323,11 +323,11 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       disperseProgress: 0,
       assembleProgress: 1,
       // 3D Orbital parameters
-      orbitalAngle: 0,  // Starting angle
-      orbitalRadius: 0, // Base radius
+      orbitalAngle: Math.random() * Math.PI * 2,  // Random starting angle
+      orbitalRadius: 70, // Default radius
       orbitalInclination: 0, // Tilt of orbital plane
-      orbitalEccentricity: 0, // How elliptical (0 = circle, 1 = very elliptical)
-      orbitalSpeed: 0, // Speed multiplier
+      orbitalEccentricity: 0.5, // Default elliptical
+      orbitalSpeed: 1, // Default speed
       orbitalPhase: 0, // Phase offset for variety
       orbitalTilt: 0, // Additional axis tilt
       // Dynamic orbital changes
@@ -660,7 +660,10 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           if (childGradStop1) childGradStop1.setAttribute("stop-color", lerpColor(fam[1], fam[0], tcol));
           
           // Independent orbital motion for each child
-          state.orbitalAngle += state.orbitalSpeed * 0.02; // Doubled speed for more visible motion
+          if (state.orbitalAngle === undefined) {
+            state.orbitalAngle = (i * 2 * Math.PI / childCount);
+          }
+          state.orbitalAngle += state.orbitalSpeed * 0.05; // Much faster for clearly visible motion
           const angle = state.orbitalAngle;
           
           // No perturbations for stable orbits
@@ -672,12 +675,12 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           const currentParentR = (parentRadius + (orbStatesRef.current[0]?.drag || 0) * 0.15) * (orbScaleRef.current || 1);
           
           // Elliptical orbital calculations for more interesting motion
-          const r = state.orbitalRadius;
+          const r = state.orbitalRadius || 70;
           const e = state.orbitalEccentricity || 0.5; // Use eccentricity for elliptical orbits
           
           // Calculate elliptical orbital position
           const a = r; // Semi-major axis
-          const b = r * (1 - e); // Semi-minor axis
+          const b = r * (1 - e * 0.5); // Semi-minor axis (less extreme ellipse)
           const orbitalX = a * Math.cos(angle);
           const orbitalY = b * Math.sin(angle);
           
@@ -702,9 +705,9 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           const parentX = parentCenterRef.current.x + parentDx * scale;
           const parentY = parentCenterRef.current.y + parentDy * scale;
           
-          // Position child relative to parent's actual position
-          const childX = parentX + finalX * scale3D * (orbScaleRef.current || 1);
-          const childY = parentY + finalY * scale3D * (orbScaleRef.current || 1);
+          // Position child relative to parent's actual position using orbital calculations
+          const childX = parentX + finalX * scale3D * scale;
+          const childY = parentY + finalY * scale3D * scale;
           
           // Store 3D position
           state.position.z = finalZ;
