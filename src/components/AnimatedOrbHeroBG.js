@@ -732,16 +732,15 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           }
           
           // Handle dispersal/reassembly animations
-          let animX = childX + dx + bounceX;
-          let animY = childY + dy + bounceY;
+          let x, y;
           
           if (state.dispersed) {
             // Animate to dispersed position
             state.disperseProgress = Math.min(1, state.disperseProgress + 0.02);
             const t = state.disperseProgress;
             const easeOut = 1 - Math.pow(1 - t, 3);
-            animX = childX + (state.disperseTarget.x - childX) * easeOut;
-            animY = childY + (state.disperseTarget.y - childY) * easeOut;
+            x = childX + (state.disperseTarget.x - childX) * easeOut;
+            y = childY + (state.disperseTarget.y - childY) * easeOut;
           } else if (state.assembleProgress < 1) {
             // Animate reassembly from below/behind
             state.assembleProgress = Math.min(1, state.assembleProgress + 0.015);
@@ -749,15 +748,16 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
             const easeInOut = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
             
             // Start from below and behind
-            const startX = state.disperseTarget.x || animX;
+            const startX = state.disperseTarget.x || childX;
             const startY = viewportSizeRef.current.vh + 100;
             
-            animX = startX + (childX - startX) * easeInOut;
-            animY = startY + (childY - startY) * easeInOut;
+            x = startX + (childX - startX) * easeInOut;
+            y = startY + (childY - startY) * easeInOut;
+          } else {
+            // Normal orbital motion - use the calculated orbital position
+            x = childX + dx + bounceX;
+            y = childY + dy + bounceY;
           }
-          
-          const x = animX;
-          const y = animY;
           
           // Apply depth-based scaling and dimming - children get smaller when scrolling
           const scrollChildScale = 1 - Math.abs(scrollVelocityRef.current) * 0.0001;
