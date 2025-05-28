@@ -846,7 +846,7 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
         cancelAnimationFrame(animationFrameIdRef.current);
       }
     };
-  }, [updateGradientColors]); // Include updateGradientColors in dependency array
+  }, []); // Empty dependency array - only run once on mount
 
   return (
     <Box
