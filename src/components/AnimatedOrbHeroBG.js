@@ -364,11 +364,11 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
             childState.initialAngle = (i * 2 * Math.PI / childCount); // Store initial angle
             // Create cosmic orbital patterns with elliptical paths
             const orbitalVariations = [
-              { radius: 60, inclination: Math.PI / 12, eccentricity: 0.6, speed: 1.2 },  // Fast inner ellipse
-              { radius: 85, inclination: -Math.PI / 8, eccentricity: 0.3, speed: 0.7 },  // Medium tilted orbit
-              { radius: 55, inclination: Math.PI / 6, eccentricity: 0.8, speed: 1.5 },   // Very fast, highly elliptical
-              { radius: 95, inclination: Math.PI / 4, eccentricity: 0.4, speed: 0.5 },   // Slow outer orbit
-              { radius: 75, inclination: -Math.PI / 10, eccentricity: 0.5, speed: 0.9 }  // Counter-tilted medium orbit
+              { radius: 60, inclination: Math.PI / 12, eccentricity: 0.6, speed: 2.5 },  // Much faster inner ellipse
+              { radius: 85, inclination: -Math.PI / 8, eccentricity: 0.3, speed: 1.8 },  // Faster tilted orbit
+              { radius: 55, inclination: Math.PI / 6, eccentricity: 0.8, speed: 3.0 },   // Very fast, highly elliptical
+              { radius: 95, inclination: Math.PI / 4, eccentricity: 0.4, speed: 1.2 },   // Moderate outer orbit
+              { radius: 75, inclination: -Math.PI / 10, eccentricity: 0.5, speed: 2.0 }  // Faster counter-tilted orbit
             ];
             const variation = orbitalVariations[i % orbitalVariations.length];
             childState.orbitalRadius = variation.radius;
@@ -660,7 +660,7 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           if (childGradStop1) childGradStop1.setAttribute("stop-color", lerpColor(fam[1], fam[0], tcol));
           
           // Independent orbital motion for each child
-          state.orbitalAngle += state.orbitalSpeed * 0.01; // Each child moves at its own speed
+          state.orbitalAngle += state.orbitalSpeed * 0.02; // Doubled speed for more visible motion
           const angle = state.orbitalAngle;
           
           // No perturbations for stable orbits
@@ -671,12 +671,15 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           const { vw, vh } = viewportSizeRef.current;
           const currentParentR = (parentRadius + (orbStatesRef.current[0]?.drag || 0) * 0.15) * (orbScaleRef.current || 1);
           
-          // Simple 2D orbital calculations for clear motion
+          // Elliptical orbital calculations for more interesting motion
           const r = state.orbitalRadius;
+          const e = state.orbitalEccentricity || 0.5; // Use eccentricity for elliptical orbits
           
-          // Calculate orbital position relative to origin (0,0)
-          const orbitalX = r * Math.cos(angle);
-          const orbitalY = r * Math.sin(angle);
+          // Calculate elliptical orbital position
+          const a = r; // Semi-major axis
+          const b = r * (1 - e); // Semi-minor axis
+          const orbitalX = a * Math.cos(angle);
+          const orbitalY = b * Math.sin(angle);
           
           // Simple 3D tilt for visual interest
           const inclination = state.orbitalInclination;
