@@ -359,18 +359,28 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
             childrenGroupRef.current.appendChild(path);
             childOrbsRef.current.push(path);
             const childState = makeOrbState();
-            // Initialize 3D orbital parameters - all children orbit around parent
-            childState.orbitalAngle = (i * 2 * Math.PI / childCount); // Evenly spaced around circle
-            childState.initialAngle = (i * 2 * Math.PI / childCount); // Store initial angle
-            // Create cosmic orbital patterns with elliptical paths
-            const orbitalVariations = [
-              { radius: 50 + Math.random() * 20, inclination: Math.PI / 12, eccentricity: 0.3 + Math.random() * 0.4, speed: 0.6 + Math.random() * 0.4 },
-              { radius: 70 + Math.random() * 25, inclination: -Math.PI / 8, eccentricity: 0.2 + Math.random() * 0.3, speed: 0.4 + Math.random() * 0.3 },
-              { radius: 45 + Math.random() * 15, inclination: Math.PI / 6, eccentricity: 0.5 + Math.random() * 0.3, speed: 0.7 + Math.random() * 0.3 },
-              { radius: 85 + Math.random() * 20, inclination: Math.PI / 4, eccentricity: 0.3 + Math.random() * 0.2, speed: 0.3 + Math.random() * 0.2 },
-              { radius: 65 + Math.random() * 20, inclination: -Math.PI / 10, eccentricity: 0.4 + Math.random() * 0.3, speed: 0.5 + Math.random() * 0.3 }
-            ];
-            const variation = orbitalVariations[i % orbitalVariations.length];
+            // Initialize 3D orbital parameters - each child gets unique orbit
+            childState.orbitalAngle = Math.random() * 2 * Math.PI; // Random starting position
+            childState.initialAngle = childState.orbitalAngle; // Store initial angle
+            
+            // Create completely unique orbital parameters for each child
+            const uniqueRadius = 40 + Math.random() * 60; // Radius between 40-100
+            const uniqueInclination = (Math.random() - 0.5) * Math.PI / 3; // Random tilt
+            const uniqueEccentricity = 0.1 + Math.random() * 0.7; // From nearly circular to very elliptical
+            const uniqueSpeed = 0.5 + Math.random() * 1.0; // Speed varies from 0.5x to 1.5x
+            
+            // Additional unique parameters for complex motion
+            childState.orbitalWobbleSpeed = 0.5 + Math.random() * 1.0; // How fast the orbit wobbles
+            childState.orbitalWobbleAmount = 0.05 + Math.random() * 0.15; // How much the orbit wobbles
+            childState.radiusOscillationSpeed = 0.3 + Math.random() * 0.7; // How fast radius changes
+            childState.radiusOscillationAmount = 5 + Math.random() * 20; // How much radius changes
+            
+            const variation = {
+              radius: uniqueRadius,
+              inclination: uniqueInclination,
+              eccentricity: uniqueEccentricity,
+              speed: uniqueSpeed
+            };
             childState.orbitalRadius = variation.radius;
             childState.orbitalInclination = variation.inclination;
             childState.orbitalEccentricity = variation.eccentricity;
@@ -653,15 +663,15 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           if (state.orbitalAngle === undefined || isNaN(state.orbitalAngle)) {
             state.orbitalAngle = (i * 2 * Math.PI / childCount);
           }
-          // Lava lamp speed with dynamic variations
+          // Smooth flowing speed with dynamic variations
           const speed = state.orbitalSpeed || 1;
-          state.orbitalAngle += speed * 0.002; // Much slower, lava lamp flow
+          state.orbitalAngle += speed * 0.008; // 4x faster but still smooth
           const angle = state.orbitalAngle;
           
-          // Add orbital wobble and distance variation
+          // Add unique orbital wobble and distance variation for each orb
           const wobbleTime = now * 0.0001;
-          const radiusVariation = Math.sin(wobbleTime + i * Math.PI) * 15; // Radius changes by ±15px
-          const pathWobble = Math.sin(wobbleTime * 1.7 + i) * 0.1; // Path wobbles slightly
+          const radiusVariation = Math.sin(wobbleTime * (state.radiusOscillationSpeed || 0.5) + i * Math.PI) * (state.radiusOscillationAmount || 15);
+          const pathWobble = Math.sin(wobbleTime * 1.7 + i) * (state.orbitalWobbleAmount || 0.1);
           
           // No perturbations for stable orbits
           state.orbitalPerturbation.x = 0;
@@ -676,8 +686,8 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           const r = baseRadius + radiusVariation; // Varying radius
           const e = state.orbitalEccentricity || 0.5;
           
-          // Rotating ellipse for more complex paths
-          const ellipseRotation = wobbleTime * 0.3 + i * Math.PI / 3;
+          // Each orb's ellipse rotates at its own unique speed
+          const ellipseRotation = wobbleTime * (state.orbitalWobbleSpeed || 0.7) + state.initialAngle;
           
           // Calculate elliptical orbital position with dynamic eccentricity
           const dynamicEccentricity = e + Math.sin(wobbleTime * 0.7 + i * 2) * 0.2;
