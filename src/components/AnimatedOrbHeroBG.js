@@ -50,6 +50,9 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
   const parentVelocityRef = useRef({ x: 0, y: 0 });
   const dataTransmissionsRef = useRef([]);
   const lastTransmissionTimeRef = useRef({});
+  const scrollDirectionRef = useRef('up');
+  const lastScrollYRef = useRef(0);
+  const orbsDispersedRef = useRef(false);
 
   const childCount = 5;
   const parentRadius = 36; // 20% smaller than 45
@@ -315,6 +318,10 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       isReturning: false, returnProgress: 0,
       position: { x: 0, y: 0, z: 0 },
       velocity: { x: 0, y: 0, z: 0 },
+      dispersed: false,
+      disperseTarget: { x: 0, y: 0 },
+      disperseProgress: 0,
+      assembleProgress: 1,
       // 3D Orbital parameters
       orbitalAngle: 0,  // Starting angle
       orbitalRadius: 0, // Base radius
@@ -612,7 +619,10 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
         
         parentCenterRef.current = { x: px, y: py };
 
-        const parentR = (parentRadius + parentDrag * 0.15) * scale;
+        // Scale parent based on scroll - enlarges when scrolling
+        const scrollScale = 1 + Math.abs(scrollVelocityRef.current) * 0.0002;
+        const dispersalScale = orbsDispersedRef.current ? 1.2 : 1;
+        const parentR = (parentRadius + parentDrag * 0.15) * scale * scrollScale * dispersalScale;
         const parentAmp = (1 + Math.abs(parentDrag) * 0.008) * scale;
         const parentPath = generateSuperSmoothBlob(px + parentDx * scale, py + parentDy * scale, parentR, parentPoints, parentMorphT, parentAmp);
         if (parentOrbRef.current) parentOrbRef.current.setAttribute('d', parentPath);
@@ -620,23 +630,8 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
 
       // Update child orbs
       if (childrenGroupRef.current && childOrbsRef.current.length === childCount) {
-        // Apply CSS rotation to the children group
-        const parentState = orbStatesRef.current[0];
-        if (parentState && orbMorphDirections[0] !== undefined) {
-          const scale = orbScaleRef.current || 1;
-          const parentAngle = orbMorphDirections[0];
-          const parentDrag = parentState.drag;
-          const parentDx = Math.cos(parentAngle) * parentDrag;
-          const parentDy = Math.sin(parentAngle) * parentDrag;
-          const parentX = parentCenterRef.current.x + parentDx * scale;
-          const parentY = parentCenterRef.current.y + parentDy * scale;
-          childrenGroupRef.current.style.transformOrigin = `${parentX}px ${parentY}px`;
-          // Apply time-based rotation to ensure movement
-          const rotationAngle = (now * 0.012) % 360; // Rotate based on time
-          childrenGroupRef.current.style.transformOrigin = `${parentX}px ${parentY}px`;
-          childrenGroupRef.current.style.transform = `rotate(${rotationAngle}deg)`;
-          childrenGroupRef.current.style.transition = 'none'; // Ensure smooth animation
-        }
+        // Remove group rotation - each child moves independently
+        childrenGroupRef.current.style.transform = 'none';
         // Create array with indices for z-sorting
         const childIndices = Array.from({ length: childCount }, (_, i) => i);
         
@@ -664,8 +659,9 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           if (childGradStop0) childGradStop0.setAttribute("stop-color", childColor);
           if (childGradStop1) childGradStop1.setAttribute("stop-color", lerpColor(fam[1], fam[0], tcol));
           
-          // Use fixed angle for each child since CSS handles rotation
-          const angle = state.initialAngle || (i * 2 * Math.PI / childCount);
+          // Independent orbital motion for each child
+          state.orbitalAngle += state.orbitalSpeed * 0.01; // Each child moves at its own speed
+          const angle = state.orbitalAngle;
           
           // No perturbations for stable orbits
           state.orbitalPerturbation.x = 0;
@@ -732,15 +728,41 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
             bounceY = pushY * pushForce;
           }
           
-          // Use orbital position with bounce effect
-          const x = childX + dx + bounceX;
-          const y = childY + dy + bounceY;
+          // Handle dispersal/reassembly animations
+          let finalX = childX + dx + bounceX;
+          let finalY = childY + dy + bounceY;
           
-          // Apply depth-based scaling and dimming
+          if (state.dispersed) {
+            // Animate to dispersed position
+            state.disperseProgress = Math.min(1, state.disperseProgress + 0.02);
+            const t = state.disperseProgress;
+            const easeOut = 1 - Math.pow(1 - t, 3);
+            finalX = childX + (state.disperseTarget.x - childX) * easeOut;
+            finalY = childY + (state.disperseTarget.y - childY) * easeOut;
+          } else if (state.assembleProgress < 1) {
+            // Animate reassembly from below/behind
+            state.assembleProgress = Math.min(1, state.assembleProgress + 0.015);
+            const t = state.assembleProgress;
+            const easeInOut = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+            
+            // Start from below and behind
+            const startX = state.disperseTarget.x || finalX;
+            const startY = viewportSizeRef.current.vh + 100;
+            
+            finalX = startX + (childX - startX) * easeInOut;
+            finalY = startY + (childY - startY) * easeInOut;
+          }
+          
+          const x = finalX;
+          const y = finalY;
+          
+          // Apply depth-based scaling and dimming - children get smaller when scrolling
+          const scrollChildScale = 1 - Math.abs(scrollVelocityRef.current) * 0.0001;
+          const dispersalChildScale = state.dispersed ? 0.7 : 1;
           const depthScale = scale3D * 0.8 + 0.2; // Keep minimum 20% size
           const depthOpacity = scale3D * 0.7 + 0.3; // Keep minimum 30% opacity
           
-          const cR = (childRadius + state.drag * 0.08) * scale * depthScale;
+          const cR = (childRadius + state.drag * 0.08) * scale * depthScale * scrollChildScale * dispersalChildScale;
           const currentChildAmp = (childAmp + Math.abs(state.drag) * 0.006) * scale * depthScale;
           const morphT = now * 0.0002 + i * 10; // Slower morphing
           
@@ -787,9 +809,10 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
             // Simple color similarity check (comparing first few characters)
             const colorMatch = childColor.substring(0, 4) === parentColor.substring(0, 4);
             
-            // Intermittent transmission (random chance)
+            // Intermittent transmission (random chance) - reduced frequency with variation
             const timeSinceLastTransmission = now - (lastTransmissionTimeRef.current[i] || 0);
-            if (timeSinceLastTransmission > 4000 && Math.random() < 0.08) {
+            const minInterval = 6000 + Math.random() * 4000; // 6-10 seconds
+            if (timeSinceLastTransmission > minInterval && Math.random() < 0.04) {
               createDataTransmission(i, x, y, parentX, parentY, childColor);
               lastTransmissionTimeRef.current[i] = now;
             }
