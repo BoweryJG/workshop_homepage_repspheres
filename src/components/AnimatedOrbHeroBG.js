@@ -475,15 +475,9 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
       const heroHeight = window.innerHeight;
       const scrollProgress = Math.min(scrollY / heroHeight, 1);
       
-      // Check if hero is visible
-      const heroElement = document.querySelector('[data-hero-section]');
-      if (heroElement) {
-        const rect = heroElement.getBoundingClientRect();
-        const prev = isHeroVisibleRef.current;
-        isHeroVisibleRef.current = rect.bottom > 0 && rect.top < window.innerHeight;
-        if (!prev && isHeroVisibleRef.current && !animationFrameIdRef.current) {
-          animationFrameIdRef.current = requestAnimationFrame(animate);
-        }
+      // Always keep animation running
+      if (!animationFrameIdRef.current) {
+        animationFrameIdRef.current = requestAnimationFrame(animate);
       }
       
       // Only parent orb responds to scroll - much gentler
@@ -520,8 +514,11 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
         return;
       }
 
-      // stop updates when hero is off screen
-      if (!isHeroVisibleRef.current) {
+      // Continue animation even when hero is off screen for smooth transitions
+      // Only stop if we're very far from the hero section
+      const scrollY = window.scrollY;
+      const heroHeight = window.innerHeight;
+      if (scrollY > heroHeight * 3) {
         animationFrameIdRef.current = null;
         return;
       }
