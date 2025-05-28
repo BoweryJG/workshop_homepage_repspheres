@@ -42,22 +42,24 @@ export default function PhilosophicalOpenerSection() {
               fontStyle: 'italic',
               position: 'relative',
               '&:before': {
-                content: '"""',
+                content: '"\\201C"',
                 position: 'absolute',
                 left: { xs: -20, md: -60 },
                 top: -20,
                 fontSize: { xs: '4rem', md: '6rem' },
                 color: 'rgba(0,255,198,0.2)',
                 fontFamily: 'Georgia, serif',
+                zIndex: -1,
               },
               '&:after': {
-                content: '"""',
+                content: '"\\201D"',
                 position: 'absolute',
                 right: { xs: -20, md: -60 },
                 bottom: -40,
                 fontSize: { xs: '4rem', md: '6rem' },
                 color: 'rgba(123,66,246,0.2)',
                 fontFamily: 'Georgia, serif',
+                zIndex: -1,
               },
             }}
           >
