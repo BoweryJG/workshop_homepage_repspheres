@@ -514,14 +514,7 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
         return;
       }
 
-      // Continue animation even when hero is off screen for smooth transitions
-      // Only stop if we're very far from the hero section
-      const scrollY = window.scrollY;
-      const heroHeight = window.innerHeight;
-      if (scrollY > heroHeight * 3) {
-        animationFrameIdRef.current = null;
-        return;
-      }
+      // Always continue animation - never stop
 
       const now = performance.now();
       
