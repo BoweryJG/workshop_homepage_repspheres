@@ -364,11 +364,11 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
             childState.initialAngle = (i * 2 * Math.PI / childCount); // Store initial angle
             // Create cosmic orbital patterns with elliptical paths
             const orbitalVariations = [
-              { radius: 60, inclination: Math.PI / 12, eccentricity: 0.6, speed: 0.8 },   // Slow inner ellipse
-              { radius: 85, inclination: -Math.PI / 8, eccentricity: 0.3, speed: 0.5 },   // Very slow tilted orbit
-              { radius: 55, inclination: Math.PI / 6, eccentricity: 0.8, speed: 1.0 },    // Slightly faster, still slow
-              { radius: 95, inclination: Math.PI / 4, eccentricity: 0.4, speed: 0.3 },    // Extremely slow outer orbit
-              { radius: 75, inclination: -Math.PI / 10, eccentricity: 0.5, speed: 0.6 }   // Slow counter-tilted orbit
+              { radius: 50 + Math.random() * 20, inclination: Math.PI / 12, eccentricity: 0.3 + Math.random() * 0.4, speed: 0.6 + Math.random() * 0.4 },
+              { radius: 70 + Math.random() * 25, inclination: -Math.PI / 8, eccentricity: 0.2 + Math.random() * 0.3, speed: 0.4 + Math.random() * 0.3 },
+              { radius: 45 + Math.random() * 15, inclination: Math.PI / 6, eccentricity: 0.5 + Math.random() * 0.3, speed: 0.7 + Math.random() * 0.3 },
+              { radius: 85 + Math.random() * 20, inclination: Math.PI / 4, eccentricity: 0.3 + Math.random() * 0.2, speed: 0.3 + Math.random() * 0.2 },
+              { radius: 65 + Math.random() * 20, inclination: -Math.PI / 10, eccentricity: 0.4 + Math.random() * 0.3, speed: 0.5 + Math.random() * 0.3 }
             ];
             const variation = orbitalVariations[i % orbitalVariations.length];
             childState.orbitalRadius = variation.radius;
@@ -653,10 +653,15 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           if (state.orbitalAngle === undefined || isNaN(state.orbitalAngle)) {
             state.orbitalAngle = (i * 2 * Math.PI / childCount);
           }
-          // Lava lamp speed - very slow and hypnotic
+          // Lava lamp speed with dynamic variations
           const speed = state.orbitalSpeed || 1;
           state.orbitalAngle += speed * 0.002; // Much slower, lava lamp flow
           const angle = state.orbitalAngle;
+          
+          // Add orbital wobble and distance variation
+          const wobbleTime = now * 0.0001;
+          const radiusVariation = Math.sin(wobbleTime + i * Math.PI) * 15; // Radius changes by ±15px
+          const pathWobble = Math.sin(wobbleTime * 1.7 + i) * 0.1; // Path wobbles slightly
           
           // No perturbations for stable orbits
           state.orbitalPerturbation.x = 0;
@@ -666,20 +671,31 @@ const AnimatedOrbHeroBG = ({ zIndex = 0, sx = {}, style = {}, className = "" }) 
           const { vw, vh } = viewportSizeRef.current;
           const currentParentR = (parentRadius + (orbStatesRef.current[0]?.drag || 0) * 0.15) * (orbScaleRef.current || 1);
           
-          // Elliptical orbital calculations for more interesting motion
-          const r = state.orbitalRadius || 70;
-          const e = state.orbitalEccentricity || 0.5; // Use eccentricity for elliptical orbits
+          // Dynamic elliptical orbital calculations
+          const baseRadius = state.orbitalRadius || 70;
+          const r = baseRadius + radiusVariation; // Varying radius
+          const e = state.orbitalEccentricity || 0.5;
           
-          // Calculate elliptical orbital position
+          // Rotating ellipse for more complex paths
+          const ellipseRotation = wobbleTime * 0.3 + i * Math.PI / 3;
+          
+          // Calculate elliptical orbital position with dynamic eccentricity
+          const dynamicEccentricity = e + Math.sin(wobbleTime * 0.7 + i * 2) * 0.2;
           const a = r; // Semi-major axis
-          const b = r * (1 - e * 0.5); // Semi-minor axis (less extreme ellipse)
-          const orbitalX = a * Math.cos(angle);
-          const orbitalY = b * Math.sin(angle);
+          const b = r * (1 - dynamicEccentricity * 0.5); // Semi-minor axis varies
           
-          // Simple 3D tilt for visual interest
-          const inclination = state.orbitalInclination;
+          // Apply rotation to ellipse
+          const baseX = a * Math.cos(angle + pathWobble);
+          const baseY = b * Math.sin(angle + pathWobble);
+          const orbitalX = baseX * Math.cos(ellipseRotation) - baseY * Math.sin(ellipseRotation);
+          const orbitalY = baseX * Math.sin(ellipseRotation) + baseY * Math.cos(ellipseRotation);
+          
+          // Enhanced 3D motion with vertical oscillation
+          const inclination = state.orbitalInclination + Math.sin(wobbleTime * 0.5 + i) * 0.2;
+          const verticalOscillation = Math.sin(wobbleTime * 0.8 + i * Math.PI / 2) * 10;
+          
           const finalX = orbitalX;
-          const finalY = orbitalY * Math.cos(inclination);
+          const finalY = orbitalY * Math.cos(inclination) + verticalOscillation;
           const finalZ = orbitalY * Math.sin(inclination);
           
           // Project 3D to 2D with perspective
