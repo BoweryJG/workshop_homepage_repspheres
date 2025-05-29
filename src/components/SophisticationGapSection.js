@@ -387,7 +387,7 @@ export default function SophisticationGapSection() {
               </Box>
             </Paper>
           </Grid>
-        </Box>
+        </Grid>
 
         {/* Gap Stats */}
         <Box
