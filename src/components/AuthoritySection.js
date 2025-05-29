@@ -316,7 +316,7 @@ export default function AuthoritySection() {
         </Box>
 
         {/* Trust Statement */}
-        <Box sx={{ textAlign: 'center', mt: 10 }}>
+        <Box sx={{ textAlign: 'center', mt: 6 }}>
           <Typography
             sx={{
               fontFamily: 'Playfair Display, Georgia, serif',

@@ -1,6 +1,5 @@
 import React from 'react';
 import NavBar from './components/NavBar';
-import StarryBackground from './components/StarryBackground';
 import HeroSectionV2 from './components/HeroSectionV2';
 import AuthoritySection from './components/AuthoritySection';
 import SophisticationGapSection from './components/SophisticationGapSection';
@@ -17,7 +16,6 @@ function App() {
   return (
     <OrbContextProvider>
       <AuthProvider>
-        <StarryBackground />
         <NavBar />
         <HeroSectionV2 />
         <AuthoritySection />
