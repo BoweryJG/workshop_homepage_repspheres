@@ -1,23 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Container, Typography, Button, Grid, Paper } from '@mui/material';
-import AnimatedOrbHeroBG from './AnimatedOrbHeroBG';
 
 export default function HeroSectionV2() {
   const [typedText, setTypedText] = useState('');
   const [showReality, setShowReality] = useState(false);
-  const heroRef = useRef();
-  const [showOrb, setShowOrb] = useState(true);
   
   const competitorText = "Your competitors already have it.";
-  
-  useEffect(() => {
-    const obs = new window.IntersectionObserver(
-      ([entry]) => setShowOrb(entry.isIntersecting),
-      { threshold: 0.1 }
-    );
-    if (heroRef.current) obs.observe(heroRef.current);
-    return () => obs.disconnect();
-  }, []);
   
   useEffect(() => {
     let index = 0;
@@ -36,8 +24,6 @@ export default function HeroSectionV2() {
 
   return (
     <Box
-      ref={heroRef}
-      data-hero-section
       sx={{
         minHeight: '100vh',
         position: 'relative',
@@ -47,19 +33,6 @@ export default function HeroSectionV2() {
         overflow: 'hidden',
       }}
     >
-      {/* Animated Background Orbs */}
-      <AnimatedOrbHeroBG
-        width={480}
-        height={480}
-        zIndex={0}
-        visible={showOrb}
-        disperse={!showOrb}
-        style={{
-          opacity: 0.9,
-          position: 'absolute',
-          pointerEvents: 'none',
-        }}
-      />
       
       {/* Main Content */}
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
