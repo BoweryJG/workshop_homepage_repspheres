@@ -1,15 +1,11 @@
 import React from 'react';
 import NavBar from './components/NavBar';
 import StarryBackground from './components/StarryBackground';
-import HeroSection from './components/HeroSection';
-import PhilosophicalOpenerSection from './components/PhilosophicalOpenerSection';
-import CrossroadsSection from './components/CrossroadsSection';
-import DataRichnessSection from './components/DataRichnessSection';
-import SystemArchitectsSection from './components/SystemArchitectsSection';
-import SocraticMethodSection from './components/SocraticMethodSection';
-import ModulesSection from './components/ModulesSection';
-import UrgencySection from './components/UrgencySection';
-import ProofOfConceptSection from './components/ProofOfConceptSection';
+import HeroSectionV2 from './components/HeroSectionV2';
+import AuthoritySection from './components/AuthoritySection';
+import SophisticationGapSection from './components/SophisticationGapSection';
+import UniverseBuildingSection from './components/UniverseBuildingSection';
+import IntelligenceProofSection from './components/IntelligenceProofSection';
 import PricingSection from './components/PricingSection';
 import CTASection from './components/CTASection';
 import OrbContextProvider from './components/OrbContextProvider';
@@ -23,17 +19,13 @@ function App() {
       <AuthProvider>
         <StarryBackground />
         <NavBar />
-        <HeroSection />
-        <PhilosophicalOpenerSection />
-        <CrossroadsSection />
-        <DataRichnessSection />
-        <SystemArchitectsSection />
-        <SocraticMethodSection />
-        <ModulesSection />
-        <UrgencySection />
-        <ProofOfConceptSection />
-        <CTASection />
+        <HeroSectionV2 />
+        <AuthoritySection />
+        <SophisticationGapSection />
+        <UniverseBuildingSection />
+        <IntelligenceProofSection />
         <PricingSection />
+        <CTASection />
         <Footer />
         <ThemeToggle />
       </AuthProvider>
